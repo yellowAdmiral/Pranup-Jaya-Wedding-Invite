@@ -81,6 +81,9 @@ h1, h2, h3, p { margin: 0; }
 .hero.leaving .hero-top, .hero.leaving .hero-copy { transition-delay: 0s; }
 .hero.leaving .hero-top, .hero.leaving .hero-copy { opacity: 0; transform: translateX(-28px); pointer-events: none; }
 .eyebrow { font: 500 .8rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: var(--marigold); text-shadow: 0 1px 10px rgba(20,24,58,.7); }
+.greet { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.4rem, 4vw, 2rem); line-height: 1.2; color: var(--ivory); text-shadow: 0 2px 16px rgba(20,24,58,.6); overflow-wrap: anywhere; }
+.greet[hidden] { display: none; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .names { font-family: var(--display); font-weight: 600; font-size: clamp(3rem, 10.5vw, 6.5rem); line-height: .98; text-wrap: balance; text-shadow: 0 2px 22px rgba(20,24,58,.45); }
 .names-ne { font-family: var(--deva); font-weight: 600; font-size: clamp(1.5rem, 4.5vw, 2.4rem); line-height: 1.3; color: var(--ivory-dim); }
 .when { font-family: var(--display); font-style: italic; font-size: clamp(1.25rem, 3.4vw, 1.7rem); line-height: 1.3; }
@@ -174,6 +177,7 @@ h1, h2, h3, p { margin: 0; }
 .note { margin-top: 28px; font-size: .95rem; max-width: 62ch; opacity: .85; }
 
 /* ---------- RSVP ---------- */
+form[hidden] { display: none; }
 form { margin-top: 36px; display: grid; gap: 28px; max-width: 640px; }
 fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 legend, .lbl { font: 500 .78rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: var(--teal); padding: 0; margin-bottom: 10px; display: block; }
@@ -415,6 +419,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 <header class="hero" id="top">
   <svg class="pj pj-hero hero-top" role="img" aria-label="Pranup and Jaya monogram, 10 02 2027"><use href="#pj"/></svg>
   <div class="hero-copy" id="heroCopy">
+    <p class="greet" id="greet" hidden></p>
     <p class="eyebrow">Together with our families</p>
     <h1 class="names" id="names" tabindex="-1">Pranup &amp; Jaya</h1>
     <p class="names-ne">प्रनुप र जया</p>
@@ -515,7 +520,8 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     <p class="kicker">RSVP · optional</p>
     <h2 class="h2" id="rTitle">Let us know if you can come</h2>
     <p class="h2-ne">उपस्थिति जनाउनुहोस्</p>
-    <p class="intro">Replying helps us plan, but there is no pressure. Fill this in and we will write the message for you to send by email.</p>
+    <p class="intro">Replying helps us plan, but there is no pressure. Fill this in and your reply reaches us right away.</p>
+    <p class="note" id="repliedNote" hidden>We already have a reply from you. Sending this again will replace it.</p>
 
     <form id="form" novalidate>
       <fieldset>
@@ -566,8 +572,19 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
         <textarea id="msg" name="msg" placeholder="Anything you would like us to know"></textarea>
       </div>
 
-      <button class="btn" type="submit">Prepare my reply</button>
+      <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+      <button class="btn" type="submit" id="sendBtn">Send my reply</button>
     </form>
+
+    <div class="result" id="thanks" hidden aria-live="polite">
+      <h3 id="thanksTitle">Thank you</h3>
+      <p id="thanksText"></p>
+      <p class="h2-ne" lang="ne">धन्यवाद</p>
+      <div class="actions">
+        <button class="btn alt" id="changeBtn" type="button">Change my answer</button>
+      </div>
+    </div>
 
     <div class="result" id="result" hidden aria-live="polite">
       <h3 id="resTitle">Your reply is ready</h3>
@@ -748,9 +765,48 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     try { reveal.focus({ preventScroll: true }); } catch (e) {}
   });
 
-  /* ----- RSVP: builds an email; nothing is sent from the page ----- */
-  var form = $('form'), result = $('result');
+  /* ----- RSVP: sends the reply to the guest sheet; falls back to an email draft ----- */
+  // Paste the Google Apps Script web app address between the quotes (see apps-script/README.md).
+  // While it is empty the form keeps working the old way: it prepares an email.
+  var ENDPOINT = '';
+
+  var form = $('form'), result = $('result'), thanks = $('thanks');
+  var guestCode = '';
   $('addr').textContent = RSVP_EMAIL;
+
+  function setSeats(n) {
+    var sel = $('party'), max = Math.max(1, Math.min(parseInt(n, 10) || 1, 12));
+    sel.textContent = '';
+    for (var i = 1; i <= max; i++) {
+      var o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = i === 1 ? '1 (just me)' : String(i);
+      sel.appendChild(o);
+    }
+    sel.value = String(max);
+  }
+
+  // A personal link ends in ?g=CODE. Look the code up so the page can greet the guest by name.
+  (function lookupGuest() {
+    var m = /[?&]g=([A-Za-z0-9]{3,12})(?:&|$)/.exec(window.location.search);
+    if (!m || !ENDPOINT || !window.fetch) return;
+    guestCode = m[1].toUpperCase();
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    fetch(ENDPOINT + '?g=' + encodeURIComponent(guestCode), ctl ? { signal: ctl.signal } : {})
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        clearTimeout(timer);
+        if (!j || !j.ok || !j.name) { guestCode = ''; return; }
+        var g = $('greet');
+        g.textContent = 'Dear ' + j.name + ',';
+        g.hidden = false;
+        $('name').value = j.name;
+        if (j.seats) setSeats(j.seats);
+        if (j.replied) $('repliedNote').hidden = false;
+      })
+      .catch(function () { clearTimeout(timer); guestCode = ''; });
+  })();
 
   function toggleAttend() {
     var yes = $('replyYes').checked;
@@ -801,12 +857,66 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
       if (first) first.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
       return;
     }
+    if (!ENDPOINT) { showEmailFallback(''); return; }
+    if ($('website').value) { showThanks(); return; } // a bot filled the hidden field; pretend it worked
+
+    var yes = $('replyYes').checked;
+    var payload = {
+      code: guestCode,
+      name: $('name').value.trim(),
+      reply: yes ? 'Yes' : 'No',
+      events: yes ? Array.prototype.map.call(form.querySelectorAll('input[name="ev"]:checked'), function (c) { return c.value; }).join(' and ') : '',
+      guests: yes ? parseInt($('party').value, 10) : 0,
+      diet: yes ? $('diet').value.trim() : '',
+      note: $('msg').value.trim()
+    };
+    var btn = $('sendBtn');
+    btn.disabled = true; btn.textContent = 'Sending...';
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // keeps it a simple request, so no CORS preflight
+      body: JSON.stringify(payload),
+      signal: ctl ? ctl.signal : undefined
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        clearTimeout(timer);
+        if (j && j.ok) { showThanks(); } else { throw new Error('rejected'); }
+      })
+      .catch(function () {
+        clearTimeout(timer);
+        showEmailFallback('We could not reach our guest list just now, so your reply has not been saved yet. You can send it by email instead.');
+      })
+      .then(function () { btn.disabled = false; btn.textContent = 'Send my reply'; });
+  });
+
+  function showThanks() {
+    var yes = $('replyYes').checked;
+    $('thanksTitle').textContent = 'Thank you';
+    $('thanksText').textContent = yes
+      ? 'We have your reply and cannot wait to celebrate with you.'
+      : 'Thank you for letting us know. We will miss you.';
+    result.hidden = true;
+    form.hidden = true;
+    thanks.hidden = false;
+    thanks.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  function showEmailFallback(why) {
     var m = build();
     $('resText').value = m.body;
     $('mailBtn').href = 'mailto:' + RSVP_EMAIL + '?subject=' + encodeURIComponent(m.subject) + '&body=' + encodeURIComponent(m.body);
-    $('status').textContent = '';
+    $('status').textContent = why;
     result.hidden = false;
     result.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  $('changeBtn').addEventListener('click', function () {
+    thanks.hidden = true;
+    form.hidden = false;
+    form.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
   });
 
   $('copyBtn').addEventListener('click', function () {
