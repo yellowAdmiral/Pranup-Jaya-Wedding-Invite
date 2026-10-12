@@ -29,6 +29,7 @@ Keep `hero.mp4` under about 10 MB so it loads quickly on phones. GitHub rejects 
 ## Things to know
 
 - The page is hidden from search engines (`noindex` in `index.html`). Anyone with the link can still open it.
-- The RSVP form builds an email. Nothing is sent from the page, and the reply address is the `RSVP_EMAIL` line near the bottom of `index.html`.
+- The RSVP form sends replies to a Google Sheet through a small Apps Script. Setup steps are in `apps-script/README.md`. Until the `ENDPOINT` line in `index.html` is filled in, or if the script cannot be reached, the form falls back to preparing an email to the `RSVP_EMAIL` address.
+- Personal links end in `?g=CODE`. The page looks the code up in the sheet to greet the guest by name.
 - The repository is public, so the address, venue and reply email in the source are public too.
 - Still to fill in: the reception date, venue name and directions (dashed underlines on the page).
