@@ -121,17 +121,36 @@ h1, h2, h3, p { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .sheet.open { animation: none; } }
 
 .panel {
-  --pad: clamp(24px, 5vw, 56px);
+  --pad: clamp(38px, 6vw, 64px); --paper: #F4EFE3;
+  position: relative; isolation: isolate;
   width: 100%; max-width: 980px; margin-inline: auto; padding: var(--pad); color: var(--ink); scroll-margin-top: 24px;
-  background: rgba(251, 245, 230, .94); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
 }
-.panel.rsvp { background: rgba(241, 231, 206, .95); }
-.panel::before {
-  content: ""; display: block; height: 28px; margin: calc(var(--pad) * -1) calc(var(--pad) * -1) var(--pad);
-  background-color: var(--indigo);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpolygon points='14,1 27,14 14,27 1,14' fill='%2314183A'/%3E%3Cpolygon points='14,7 21,14 14,21 7,14' fill='%23F2A900'/%3E%3Cpolygon points='14,11 17,14 14,17 11,14' fill='%230E6B6B'/%3E%3C/svg%3E");
-  background-size: 28px 28px;
+.panel.rsvp { --paper: #F3ECDC; }
+/* Hand-torn thick paper, built as two layers behind the text: a bright, fluffy rim of exposed fibres, and the
+   paper face resting on it with its own sharp, uneven tear line. Only these layers are roughened; the text stays crisp. */
+.paper { position: absolute; inset: 0; z-index: -1; pointer-events: none; filter: drop-shadow(0 16px 26px rgba(10, 12, 36, .38)); }
+.paper i { display: block; position: absolute; }
+.paper .rim {
+  inset: 18px; background-color: #FFFFFB;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .40  0 0 0 0 .34  0 0 0 0 .24  .45 0 0 0 -.13'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 260px 260px;
+  filter: url(#rimA) drop-shadow(0 .5px 1px rgba(10, 12, 36, .25));
 }
+.paper .face {
+  inset: 22px; background-color: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .40  0 0 0 0 .34  0 0 0 0 .24  .45 0 0 0 -.13'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 260px 260px;
+  filter: url(#faceA) drop-shadow(0 0 1.1px rgba(80, 62, 34, .6));
+}
+/* RIM-OFF: the white torn rim is switched off for now. Delete the next line to bring it back. */
+.paper .rim { display: none; }
+.panel.rsvp .rim { filter: url(#rimB) drop-shadow(0 .5px 1px rgba(10, 12, 36, .25)); }
+.panel.rsvp .face { filter: url(#faceB) drop-shadow(0 0 1.1px rgba(80, 62, 34, .6)); }
+.panel::before, .hem {
+  content: ""; display: block; height: 75px; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='75' viewBox='0 0 30 75' shape-rendering='crispEdges'%3E%3Crect x='0' y='0' width='30' height='3' fill='%2312905F'/%3E%3Crect x='0' y='3' width='30' height='3' fill='%2312905F'/%3E%3Crect x='12.0' y='6' width='6.0' height='3' fill='%23D4343A'/%3E%3Crect x='9.0' y='9' width='12.0' height='3' fill='%23D4343A'/%3E%3Crect x='6.0' y='12' width='18.0' height='3' fill='%23D4343A'/%3E%3Crect x='3.0' y='15' width='24.0' height='3' fill='%23D4343A'/%3E%3Crect x='6.0' y='18' width='18.0' height='3' fill='%23D4343A'/%3E%3Crect x='9.0' y='21' width='12.0' height='3' fill='%23D4343A'/%3E%3Crect x='12.0' y='24' width='6.0' height='3' fill='%23D4343A'/%3E%3Crect x='0' y='30' width='3.0' height='3' fill='%23F2A900'/%3E%3Crect x='27.0' y='30' width='3.0' height='3' fill='%23F2A900'/%3E%3Crect x='0' y='33' width='9.0' height='3' fill='%23F2A900'/%3E%3Crect x='21.0' y='33' width='9.0' height='3' fill='%23F2A900'/%3E%3Crect x='0' y='36' width='30' height='3' fill='%23F2A900'/%3E%3Crect x='0' y='39' width='9.0' height='3' fill='%23F2A900'/%3E%3Crect x='21.0' y='39' width='9.0' height='3' fill='%23F2A900'/%3E%3Crect x='0' y='42' width='3.0' height='3' fill='%23F2A900'/%3E%3Crect x='27.0' y='42' width='3.0' height='3' fill='%23F2A900'/%3E%3Crect x='12.0' y='48' width='6.0' height='3' fill='%231E2030'/%3E%3Crect x='9.0' y='51' width='12.0' height='3' fill='%231E2030'/%3E%3Crect x='6.0' y='54' width='18.0' height='3' fill='%231E2030'/%3E%3Crect x='3.0' y='57' width='24.0' height='3' fill='%231E2030'/%3E%3Crect x='6.0' y='60' width='18.0' height='3' fill='%231E2030'/%3E%3Crect x='9.0' y='63' width='12.0' height='3' fill='%231E2030'/%3E%3Crect x='12.0' y='66' width='6.0' height='3' fill='%231E2030'/%3E%3Crect x='0' y='69' width='30' height='3' fill='%2312905F'/%3E%3Crect x='0' y='72' width='30' height='3' fill='%2312905F'/%3E%3C/svg%3E"); background-size: 30px 75px; background-repeat: repeat-x; background-position: 50% 0;
+}
+/* Dhaka-cloth strips, woven across the top and bottom of each sheet, kept crisp (they sit above the roughened paper). */
+.panel::before { margin: calc(var(--pad) * -1 + 36px) 0 calc(var(--pad) * .8); }
+.hem { margin-top: calc(var(--pad) * .8); margin-bottom: calc(36px - var(--pad)); }
 .kicker { font: 500 .78rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: var(--teal); }
 .h2 { font-family: var(--display); font-weight: 600; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.1; margin-top: 8px; text-wrap: balance; }
 .h2-ne { font-family: var(--deva); font-weight: 600; font-size: 1.2rem; color: var(--teal); margin-top: 6px; }
@@ -139,12 +158,9 @@ h1, h2, h3, p { margin: 0; }
 .intro-ne { margin-top: 8px; max-width: 62ch; font-family: var(--deva); font-size: .95rem; line-height: 1.8; color: var(--teal); }
 
 .events { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; margin-top: 40px; }
-.event { min-width: 0; padding: 28px 26px 30px; border: 1.5px solid var(--indigo); background: #FFFCF3; display: flex; flex-direction: column; gap: 4px; }
-.event.alt { background: var(--indigo); color: var(--ivory); }
+.event { min-width: 0; padding: 22px 4px 4px; border-top: 1px solid rgba(20, 24, 58, .45); display: flex; flex-direction: column; gap: 4px; }
 .event .label { font: 500 .78rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: var(--magenta); }
-.event.alt .label { color: var(--marigold); }
 .event .label-ne { font-family: var(--deva); font-size: .9rem; color: var(--teal); }
-.event.alt .label-ne { color: var(--ivory-dim); }
 .date { font-family: var(--display); font-weight: 600; font-size: 1.9rem; line-height: 1.15; margin-top: 12px; }
 .date-ne, .line-ne { font-family: var(--deva); font-size: .95rem; line-height: 1.7; }
 .line { font-size: 1rem; margin-top: 8px; }
@@ -420,8 +436,43 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
   </div>
 </header>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="rimA" x="-4%" y="-2%" width="108%" height="104%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.013" numOctaves="3" seed="8" result="n"/>
+      <feComponentTransfer in="n" result="wander"><feFuncR type="linear" slope="3" intercept="-1"/><feFuncG type="linear" slope="3" intercept="-1"/></feComponentTransfer>
+      <feDisplacementMap in="SourceGraphic" in2="wander" scale="12" xChannelSelector="R" yChannelSelector="G" result="a"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="12" result="fibre"/>
+      <feDisplacementMap in="a" in2="fibre" scale="10" xChannelSelector="R" yChannelSelector="B" result="b"/>
+      <feGaussianBlur in="b" stdDeviation="0.7" result="c"/>
+      <feComponentTransfer in="c"><feFuncA type="table" tableValues="0 0.05 0.45 0.95 1"/></feComponentTransfer>
+    </filter>
+    <filter id="faceA" x="-4%" y="-2%" width="108%" height="104%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.008" numOctaves="1" seed="15" result="wander"/>
+      <feDisplacementMap in="SourceGraphic" in2="wander" scale="5" xChannelSelector="R" yChannelSelector="G" result="a"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="31" result="fibre"/>
+      <feDisplacementMap in="a" in2="fibre" scale="1.6" xChannelSelector="R" yChannelSelector="B"/>
+    </filter>
+    <filter id="rimB" x="-4%" y="-2%" width="108%" height="104%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.011" numOctaves="3" seed="29" result="n"/>
+      <feComponentTransfer in="n" result="wander"><feFuncR type="linear" slope="3" intercept="-1"/><feFuncG type="linear" slope="3" intercept="-1"/></feComponentTransfer>
+      <feDisplacementMap in="SourceGraphic" in2="wander" scale="12" xChannelSelector="R" yChannelSelector="G" result="a"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="3" seed="40" result="fibre"/>
+      <feDisplacementMap in="a" in2="fibre" scale="10" xChannelSelector="R" yChannelSelector="B" result="b"/>
+      <feGaussianBlur in="b" stdDeviation="0.7" result="c"/>
+      <feComponentTransfer in="c"><feFuncA type="table" tableValues="0 0.05 0.45 0.95 1"/></feComponentTransfer>
+    </filter>
+    <filter id="faceB" x="-4%" y="-2%" width="108%" height="104%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.007 0.006" numOctaves="1" seed="52" result="wander"/>
+      <feDisplacementMap in="SourceGraphic" in2="wander" scale="5" xChannelSelector="R" yChannelSelector="G" result="a"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="9" result="fibre"/>
+      <feDisplacementMap in="a" in2="fibre" scale="1.6" xChannelSelector="R" yChannelSelector="B"/>
+    </filter>
+  </defs>
+</svg>
 <div class="sheet" id="sheet" hidden>
   <section class="panel" id="details" aria-labelledby="dTitle">
+  <div class="paper" aria-hidden="true"><i class="rim"></i><i class="face"></i></div>
     <p class="kicker">The celebrations</p>
     <h2 class="h2" id="dTitle">Two days to be with us</h2>
     <p class="h2-ne">उत्सवका दिनहरू</p>
@@ -456,9 +507,11 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
       </article>
     </div>
     <p class="note">Times may change slightly. We will update this page, so check back closer to the day.</p>
+    <div class="hem" aria-hidden="true"></div>
   </section>
 
   <section class="panel rsvp" id="rsvp" aria-labelledby="rTitle">
+  <div class="paper" aria-hidden="true"><i class="rim"></i><i class="face"></i></div>
     <p class="kicker">RSVP · optional</p>
     <h2 class="h2" id="rTitle">Let us know if you can come</h2>
     <p class="h2-ne">उपस्थिति जनाउनुहोस्</p>
@@ -528,6 +581,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
       <p class="status" id="status" role="status"></p>
       <p style="font-size:.9rem;opacity:.8">Nothing is sent from this page. Your reply reaches us only after you send the email.</p>
     </div>
+    <div class="hem" aria-hidden="true"></div>
   </section>
 </div>
 
