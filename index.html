@@ -43,8 +43,18 @@ h1, h2, h3, p { margin: 0; }
 .stage { position: fixed; inset: 0; z-index: 0; background: #14304F; overflow: hidden; }
 .scene, .film, .shade, .lh { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .scene { }
-.film { object-fit: cover; opacity: 0; transition: opacity 1.6s ease; }
+.film { object-fit: cover; object-position: 72% 50%; opacity: 0; transition: opacity 1.6s ease; }
 .film.on { opacity: 1; }
+.scene { transition: opacity 1.6s ease; }
+.stage.filmon .scene { opacity: 0; }
+/* Portrait phones: the 16:9 film would be cropped to its middle quarter. The couple sit at ~73-92%
+   across and the lighthouse at ~43%, so show a square block anchored to the right, and fade it into the
+   dark area behind the text. */
+@media (max-aspect-ratio: 4/5) {
+  .stage { background: var(--indigo); }
+  .film { bottom: auto; height: min(100vw, 62%); object-position: 83% 50%;
+    -webkit-mask-image: linear-gradient(#000 72%, transparent 100%); mask-image: linear-gradient(#000 72%, transparent 100%); }
+}
 .shade { background: linear-gradient(to bottom, rgba(20,24,58,.30) 0%, rgba(20,24,58,.08) 32%, rgba(20,24,58,.55) 70%, rgba(20,24,58,.88) 100%); }
 .lh { position: fixed; z-index: 1; pointer-events: none; transition: opacity 1.5s ease, visibility 0s; }
 .lh.done { opacity: 0; visibility: hidden; transition: opacity 1.5s ease, visibility 0s 1.5s; }
@@ -542,7 +552,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 
   // Lantern centre, in the scene's own units. The light floods outward from here.
   var PX = 800, PY = 236, DURATION = 3750;
-  var busy = false, entered = false, loaded = false;
+  var busy = false, entered = false, playing = false;
   var beamTurn = $('beamTurn'), flare = $('flare'), glow = lh.querySelector('.glow');
 
   /* ----- Camera geometry: both layers share one viewBox, sized to the screen ----- */
@@ -568,21 +578,35 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
   window.addEventListener('resize', function () { if (!busy) frame(); });
   if (reduce && lh.pauseAnimations) lh.pauseAnimations();
 
-  /* ----- Video: starts once the lighthouse has dissolved ----- */
-  function showFilm() {
-    if (!loaded || !entered) return;
-    film.classList.add('on');
+  /* ----- Video: starts from the Reveal tap (phones only allow playback after a gesture),
+     and fades in once frames are actually playing ----- */
+  function setPauseLabel(isPlaying) {
     pauseBtn.hidden = false;
-    if (reduce) {
-      film.pause();
-      pauseBtn.textContent = 'Play video';
-      pauseBtn.setAttribute('aria-pressed', 'true');
-    } else {
-      var p = film.play();
-      if (p && p.catch) p.catch(function () {});
-    }
+    pauseBtn.textContent = isPlaying ? 'Pause video' : 'Play video';
+    pauseBtn.setAttribute('aria-pressed', isPlaying ? 'false' : 'true');
   }
-  film.addEventListener('loadeddata', function () { loaded = true; showFilm(); });
+  function tryPlay() {
+    var p;
+    try { p = film.play(); } catch (e) { p = null; }
+    if (p && p.then) p.then(function () {}, function () { if (entered) setPauseLabel(false); });
+  }
+  function startFilm() {
+    film.muted = true; film.defaultMuted = true;
+    film.setAttribute('playsinline', ''); film.setAttribute('webkit-playsinline', '');
+    if (film.readyState === 0) { try { film.load(); } catch (e) {} }
+    if (!reduce) tryPlay();
+  }
+  function showFilm() {
+    if (!entered) return;
+    if (reduce) {
+      if (film.readyState >= 2) { film.classList.add('on'); stage.classList.add('filmon'); film.pause(); setPauseLabel(false); }
+      return;
+    }
+    if (playing) { film.classList.add('on'); stage.classList.add('filmon'); setPauseLabel(!film.paused); }
+    else tryPlay();   // fades in from the 'playing' event; shows a Play button if the phone blocks it
+  }
+  film.addEventListener('playing', function () { playing = true; showFilm(); });
+  film.addEventListener('loadeddata', function () { if (reduce) showFilm(); });
   pauseBtn.addEventListener('click', function () {
     if (film.paused) {
       var p = film.play();
@@ -638,6 +662,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     busy = true;
     reveal.disabled = true;
     hero.classList.add('leaving');
+    startFilm();
     var R = floodRadius();
     if (reduce) { flare.setAttribute('r', R.toFixed(0)); setTimeout(arrive, 300); return; }
     var start = null;
@@ -659,7 +684,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 
   $('back').addEventListener('click', function () {
     entered = false; busy = false;
-    film.pause(); film.classList.remove('on'); pauseBtn.hidden = true;
+    film.pause(); playing = false; film.classList.remove('on'); stage.classList.remove('filmon'); pauseBtn.hidden = true;
     sheet.hidden = true; sheet.classList.remove('open'); foot.hidden = true;
     hero.classList.remove('entered');
     lh.classList.remove('done');
