@@ -738,6 +738,21 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 
   var form = $('form'), result = $('result'), thanks = $('thanks');
   var guestCode = '';
+
+  // Add &debug=1 to a personal link to see what the page tried and what came back.
+  var DEBUG = /[?&]debug=1(?:&|$)/.test(window.location.search);
+  function dbg(msg) {
+    if (!DEBUG) return;
+    var box = $('dbg');
+    if (!box) {
+      box = document.createElement('pre');
+      box.id = 'dbg';
+      box.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:40vh;overflow:auto;margin:0;padding:10px;z-index:99;background:#000;color:#9f9;font:12px/1.4 monospace;white-space:pre-wrap;word-break:break-all;border-radius:6px';
+      document.body.appendChild(box);
+    }
+    box.textContent += msg + '\n';
+  }
+  dbg('page loaded. ENDPOINT set: ' + !!ENDPOINT + '. search = ' + window.location.search);
   $('addr').textContent = RSVP_EMAIL;
 
   function setSeats(n) {
@@ -755,15 +770,17 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
   // A personal link ends in ?g=CODE. Look the code up so the page can greet the guest by name.
   (function lookupGuest() {
     var m = /[?&]g=([A-Za-z0-9]{3,12})(?:&|$)/.exec(window.location.search);
-    if (!m || !ENDPOINT || !window.fetch) return;
+    if (!m || !ENDPOINT || !window.fetch) { dbg('lookup skipped. code in link: ' + !!m + ', endpoint: ' + !!ENDPOINT + ', fetch: ' + !!window.fetch); return; }
     guestCode = m[1].toUpperCase();
     var ctl = window.AbortController ? new AbortController() : null;
-    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
+    dbg('lookup start for code ' + guestCode);
     fetch(ENDPOINT + '?g=' + encodeURIComponent(guestCode), ctl ? { signal: ctl.signal } : {})
-      .then(function (r) { return r.json(); })
+      .then(function (r) { dbg('lookup http status ' + r.status + ', type ' + r.type); return r.text(); })
+      .then(function (t) { dbg('lookup body: ' + t.slice(0, 200)); return JSON.parse(t); })
       .then(function (j) {
         clearTimeout(timer);
-        if (!j || !j.ok || !j.name) { guestCode = ''; return; }
+        if (!j || !j.ok || !j.name) { dbg('lookup: code not recognised'); guestCode = ''; return; }
         var g = $('greet');
         g.textContent = 'Dear ' + j.name + ',';
         g.hidden = false;
@@ -771,7 +788,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
         if (j.seats) setSeats(j.seats);
         if (j.replied) $('repliedNote').hidden = false;
       })
-      .catch(function () { clearTimeout(timer); guestCode = ''; });
+      .catch(function (err) { clearTimeout(timer); dbg('lookup failed: ' + (err && err.name) + ': ' + (err && err.message)); guestCode = ''; });
   })();
 
   function toggleAttend() {
@@ -846,13 +863,15 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
       body: JSON.stringify(payload),
       signal: ctl ? ctl.signal : undefined
     })
-      .then(function (r) { return r.json(); })
+      .then(function (r) { dbg('send http status ' + r.status + ', type ' + r.type); return r.text(); })
+      .then(function (t) { dbg('send body: ' + t.slice(0, 200)); return JSON.parse(t); })
       .then(function (j) {
         clearTimeout(timer);
-        if (j && j.ok) { showThanks(); } else { throw new Error('rejected'); }
+        if (j && j.ok) { showThanks(); } else { throw new Error('script said: ' + (j && j.error || 'not ok')); }
       })
-      .catch(function () {
+      .catch(function (err) {
         clearTimeout(timer);
+        dbg('send failed: ' + (err && err.name) + ': ' + (err && err.message) + ' | code sent: "' + guestCode + '"');
         showEmailFallback('We could not reach our guest list just now, so your reply has not been saved yet. You can send it by email instead.');
       })
       .then(function () { btn.disabled = false; btn.textContent = 'Send my reply'; });
