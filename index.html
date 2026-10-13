@@ -734,7 +734,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
   /* ----- RSVP: sends the reply to the guest sheet; falls back to an email draft ----- */
   // Paste the Google Apps Script web app address between the quotes (see apps-script/README.md).
   // While it is empty the form keeps working the old way: it prepares an email.
-  var ENDPOINT = '';
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzBGJs__oHfuwx94GykfmUTqsiT8EytGwG0nc5PTAT4Vhw1oY9SE-vZtkFmvV1pCZ3d/exec';
 
   var form = $('form'), result = $('result'), thanks = $('thanks');
   var guestCode = '';

@@ -12,6 +12,7 @@
 var GUESTS_TAB = 'Guests';
 var REPLIES_TAB = 'Replies';
 var REPLIED_COLUMN = 8;            // column H on the Guests tab
+var REQUIRE_VALID_CODE = true;     // true: only guests with a real code from the Guests tab can save a reply
 var NOTIFY_EMAIL = '';             // optional: an address to email on every reply. Leave '' for none.
 var REPLY_HEADERS = ['Time', 'Code', 'Name', 'Reply', 'Celebrations', 'Guests', 'Food needs', 'Note'];
 
@@ -40,6 +41,7 @@ function doPost(e) {
   if (!name || !reply) return json_({ ok: false, error: 'missing name or reply' });
 
   var code = String(d.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+  if (REQUIRE_VALID_CODE && !findGuest_(code)) return json_({ ok: false, error: 'unknown code' });
   var guests = reply === 'Yes' ? Math.max(1, Math.min(parseInt(d.guests, 10) || 1, 20)) : 0;
   var record = [
     new Date(), code, name, reply,
