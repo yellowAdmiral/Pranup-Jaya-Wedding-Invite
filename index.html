@@ -125,8 +125,8 @@ h1, h2, h3, p { margin: 0; }
 /* ---------- Invitation panels over the video ---------- */
 .sheet { position: relative; z-index: 2; padding-inline: var(--gutter); padding-block: 8px 56px; display: grid; gap: 40px; }
 .sheet[hidden] { display: none !important; }
-.sheet.open { animation: rise .9s ease both; }
-@keyframes rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+.sheet.open { animation: rise .7s ease both; }
+@keyframes rise { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sheet.open { animation: none; } }
 
 .panel {
@@ -216,6 +216,126 @@ footer .script { font-family: var(--script); font-style: normal; font-size: 1.9r
 footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; color: var(--ivory-dim); }
 .back { margin-top: 12px; background: none; border: 1px solid rgba(251,245,230,.5); color: var(--ivory); font: 500 .85rem/1 var(--body); letter-spacing: .08em; padding: 14px 20px; min-height: 48px; cursor: pointer; border-radius: 999px; }
 .back:hover { background: rgba(251,245,230,.1); }
+
+/* ---------- Motion vocabulary ----------
+   One easing for everything that arrives, so the page moves as one hand.
+   Only opacity and transform are animated, which phones handle cheaply. */
+:root { --ease: cubic-bezier(.22, .72, .16, 1); --ease-soft: cubic-bezier(.45, 0, .2, 1); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Hero arrives in one sequence on load: monogram, the names written in, then the rest.
+   'backwards' fill only holds the start state, so the leaving transition still works afterwards. */
+@keyframes enter { from { opacity: 0; transform: translateY(18px); } }
+@keyframes ink { from { clip-path: inset(-25% 100% -25% -6%); } to { clip-path: inset(-25% -6% -25% -6%); } }
+.hero-top { animation: enter 1.1s var(--ease) .15s backwards; }
+.names { animation: ink 1.9s var(--ease-soft) .45s backwards; }
+.names-ne { animation: enter 1s var(--ease) 1.5s backwards; }
+.when { animation: enter 1s var(--ease) 1.7s backwards; }
+.count { animation: enter 1s var(--ease) 1.9s backwards; }
+.hero-copy > .cta-wrap { animation: enter 1s var(--ease) 2.1s backwards; }
+.greet { animation: enter 1s var(--ease) .2s backwards; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-top, .names, .names-ne, .when, .count, .hero-copy > .cta-wrap, .greet { animation: none; }
+}
+
+/* ---------- Countdown ---------- */
+.count { display: flex; flex-wrap: wrap; align-items: stretch; margin-top: 6px; color: var(--ivory); }
+.count[hidden] { display: none; }
+.cu { display: grid; justify-items: start; padding: 2px clamp(14px, 3vw, 24px) 2px 0; margin-right: clamp(14px, 3vw, 24px); border-right: 1px solid rgba(251, 245, 230, .28); }
+.cu:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
+.cn { position: relative; display: block; height: 1.05em; overflow: hidden; font-family: var(--display); font-weight: 600; font-size: clamp(2rem, 6vw, 2.9rem); line-height: 1.05; font-variant-numeric: lining-nums tabular-nums; text-shadow: 0 2px 14px rgba(20, 24, 58, .5); }
+.cn span { display: block; }
+.cn .out { position: absolute; left: 0; top: 0; animation: rollOut .55s var(--ease) both; }
+.cn .in { animation: rollIn .55s var(--ease) both; }
+@keyframes rollOut { to { transform: translateY(-100%); opacity: 0; } }
+@keyframes rollIn { from { transform: translateY(100%); opacity: 0; } }
+.cl { font: 500 .82rem/1.3 var(--body); letter-spacing: .06em; color: var(--ivory-dim); margin-top: 4px; }
+.cl-ne { font-family: var(--deva); font-size: .8rem; line-height: 1.4; color: var(--marigold); }
+.count-done { font-family: var(--display); font-style: italic; font-size: clamp(1.25rem, 3.4vw, 1.7rem); color: var(--marigold); }
+
+/* ---------- Sheet layout: our story on the left, the invitation on the right ---------- */
+.sheet { grid-template-columns: minmax(0, 1fr); align-items: start; }
+.invite { display: grid; gap: 40px; min-width: 0; }
+@media (min-width: 1040px) {
+  .sheet { grid-template-columns: clamp(250px, 23vw, 320px) minmax(0, 1fr); column-gap: clamp(28px, 3.5vw, 56px); }
+  .invite .panel { margin-inline: 0 auto; }
+}
+
+/* ---------- Our story: photo prints laid beside the letter ---------- */
+.story { min-width: 0; color: var(--ivory); padding-top: 18px; }
+.story-head { display: grid; gap: 2px; margin-bottom: 26px; }
+.story-title { font-family: var(--script); font-weight: 400; font-size: clamp(2.6rem, 7vw, 3.4rem); line-height: 1.05; text-shadow: 0 2px 16px rgba(20,24,58,.55); }
+.story-ne { font-family: var(--deva); font-size: 1rem; color: var(--marigold); }
+.prints { list-style: none; margin: 0; padding: 0; display: grid; gap: 34px; }
+.print { --tilt: 0deg; margin: 0; background: #FBF7EC; padding: 10px 10px 14px; transform: rotate(var(--tilt));
+  box-shadow: 0 1px 2px rgba(10, 12, 36, .35), 0 12px 22px rgba(10, 12, 36, .35); color: var(--ink); }
+.prints li:nth-child(odd) .print { --tilt: -2.2deg; }
+.prints li:nth-child(even) .print { --tilt: 1.8deg; margin-left: 14px; }
+.prints li:nth-child(3n) .print { --tilt: -.8deg; }
+.ph { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: linear-gradient(170deg, #2A3170 0%, #6A4F8F 52%, #E58B5A 86%, #F7C26B 100%); }
+.ph::after { /* placeholder until a photo is added: the year, set large */
+  content: "Photo to come"; position: absolute; left: 14px; bottom: 12px; font-family: var(--display); font-style: italic; font-weight: 500;
+  font-size: 1.15rem; line-height: 1; color: rgba(251, 245, 230, .85); }
+.ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .8s var(--ease); z-index: 1; }
+.ph img.ok { opacity: 1; }
+.print figcaption { padding: 12px 4px 0; display: grid; gap: 2px; }
+.print .yr { font: 500 .78rem/1.3 var(--body); letter-spacing: .14em; color: var(--magenta); }
+.print .cap { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 1.22rem; line-height: 1.25; }
+.print .cap-ne { font-family: var(--deva); font-size: .85rem; line-height: 1.6; color: var(--teal); }
+.swipe { display: none; }
+/* Phones and small tablets: the prints become a swipeable row above the invitation. */
+@media (max-width: 1039.98px) {
+  .story { padding-top: 6px; margin-inline: calc(var(--gutter) * -1); }
+  .story-head { padding-inline: var(--gutter); margin-bottom: 14px; }
+  .prints { grid-auto-flow: column; grid-auto-columns: min(58vw, 240px); gap: 22px; overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); padding: 14px var(--gutter) 26px; scrollbar-width: none; }
+  .prints::-webkit-scrollbar { display: none; }
+  .prints li { scroll-snap-align: start; }
+  .prints li:nth-child(even) .print { margin-left: 0; margin-top: 12px; }
+  .swipe { display: block; font: 400 .85rem/1.4 var(--body); color: var(--ivory-dim); }
+}
+
+/* ---------- Getting here ---------- */
+.route { margin-top: 34px; max-width: 760px; }
+.route svg { display: block; width: 100%; height: auto; overflow: visible; }
+.route .road { fill: none; stroke: var(--indigo); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.route .ground { fill: rgba(14, 107, 107, .1); }
+.route .stop { fill: var(--paper); stroke: var(--indigo); stroke-width: 2.5; }
+.route .stop.end { fill: var(--marigold); }
+.route text { font-family: var(--body); font-size: 15px; fill: var(--ink); }
+.route .alt { font-size: 12.5px; fill: var(--teal); }
+.route .big { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 21px; }
+@media (max-width: 600px) { .route text { font-size: 24px; } .route .big { font-size: 34px; } .route .alt { font-size: 23px; } .route .long { display: none; } }
+.route-meta { margin-top: 6px; font-family: var(--display); font-style: italic; font-size: 1.2rem; }
+.steps { list-style: none; margin: 36px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 26px; counter-reset: step; }
+.steps li { counter-increment: step; border-top: 1px solid rgba(20, 24, 58, .45); padding-top: 16px; display: grid; gap: 6px; align-content: start; }
+.steps li::before { content: counter(step); font-family: var(--display); font-weight: 600; font-size: 2.2rem; line-height: 1; color: var(--magenta); }
+.steps h3 { font-family: var(--display); font-weight: 600; font-size: 1.45rem; line-height: 1.2; }
+.steps p { font-size: .98rem; }
+.steps .ne { font-family: var(--deva); font-size: .9rem; line-height: 1.7; color: var(--teal); }
+.tips { margin: 30px 0 0; padding: 20px 22px; background: rgba(242, 169, 0, .14); border-left: 3px solid var(--marigold); max-width: 68ch; display: grid; gap: 8px; }
+.tips p { font-size: .98rem; }
+.tips b { font-weight: 500; }
+
+/* ---------- Arrivals on scroll ----------
+   Applied only when scripting runs, so nothing stays hidden if it does not. */
+@keyframes unfold { from { opacity: 0; transform: translateY(36px) scale(.985); } }
+@keyframes settle { from { opacity: 0; transform: translate(-26px, 26px) rotate(calc(var(--tilt) * -3)) scale(1.05); } }
+@keyframes draw { from { stroke-dashoffset: 1; } }
+@keyframes pop { from { opacity: 0; transform: scale(.4); } }
+html.js .rv:not(.in) { opacity: 0; }
+html.js .panel.rv.in, html.js .story-head.rv.in { animation: unfold 1.1s var(--ease) backwards; }
+html.js .print.rv.in { animation: settle 1.2s var(--ease) var(--delay, 0s) backwards; }
+html.js .route.rv:not(.in) { opacity: 1; }
+html.js .route.rv:not(.in) .road { stroke-dashoffset: 1; }
+html.js .route.rv:not(.in) .stop, html.js .route.rv:not(.in) text { opacity: 0; }
+html.js .route.rv.in .road { animation: draw 2.4s var(--ease-soft) .2s backwards; }
+html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box; transform-origin: center; animation: pop .7s var(--ease) var(--at, 0s) backwards; }
+@media (prefers-reduced-motion: reduce) {
+  html.js .rv:not(.in), html.js .route.rv:not(.in) .stop, html.js .route.rv:not(.in) text { opacity: 1; }
+  html.js .route.rv:not(.in) .road { stroke-dashoffset: 0; }
+  html.js .rv.in, html.js .rv.in .road, html.js .rv.in .stop, html.js .rv.in text { animation: none !important; }
+}
 </style>
 
 <style>[hidden]{display:none!important} img{max-width:100%}</style>
@@ -422,6 +542,14 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     <h1 class="names" id="names" tabindex="-1">Pranup &amp; Jaya</h1>
     <p class="names-ne">प्रनुप र जया</p>
     <p class="when">are tying the knot · 10 February 2027 · Darjeeling</p>
+    <div class="count" id="count" role="timer" hidden>
+      <p class="sr" id="countSr" aria-live="off"></p>
+      <div class="cu" aria-hidden="true"><span class="cn" data-u="d"><span></span></span><span class="cl">days</span><span class="cl-ne">दिन</span></div>
+      <div class="cu" aria-hidden="true"><span class="cn" data-u="h"><span></span></span><span class="cl">hours</span><span class="cl-ne">घण्टा</span></div>
+      <div class="cu" aria-hidden="true"><span class="cn" data-u="m"><span></span></span><span class="cl">minutes</span><span class="cl-ne">मिनेट</span></div>
+      <div class="cu" aria-hidden="true"><span class="cn" data-u="s"><span></span></span><span class="cl">seconds</span><span class="cl-ne">सेकेन्ड</span></div>
+    </div>
+    <p class="count-done" id="countDone" hidden>Married on 10 February 2027. Thank you for celebrating with us.</p>
     <div class="cta-wrap">
       <button class="cta" id="reveal" type="button" aria-controls="sheet">
         <span>Reveal the details</span>
@@ -440,7 +568,30 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 </header>
 
 <div class="sheet" id="sheet" hidden>
-  <section class="panel" id="details" aria-labelledby="dTitle">
+  <!-- Our story. To add a photo, put it in the story folder as 1.jpg to 5.jpg (portrait, about 1000 px tall).
+       Until a photo is there, its frame shows a dusk-coloured card. Change the years and captions below. -->
+  <aside class="story" id="story" aria-labelledby="sTitle">
+    <div class="story-head rv">
+      <h2 class="story-title" id="sTitle">Our story</h2>
+      <p class="story-ne">हाम्रो कथा</p>
+      <p class="swipe">Swipe through</p>
+    </div>
+    <ol class="prints">
+      <li><figure class="print rv"><div class="ph"><img src="story/1.jpg" alt="" loading="lazy"></div>
+        <figcaption><span class="yr"><span class="tbc">[Year]</span></span><span class="cap">The day we met</span><span class="cap-ne">पहिलो भेट</span></figcaption></figure></li>
+      <li><figure class="print rv"><div class="ph"><img src="story/2.jpg" alt="" loading="lazy"></div>
+        <figcaption><span class="yr"><span class="tbc">[Year]</span></span><span class="cap">Our first trip together</span><span class="cap-ne">सँगैको पहिलो यात्रा</span></figcaption></figure></li>
+      <li><figure class="print rv"><div class="ph"><img src="story/3.jpg" alt="" loading="lazy"></div>
+        <figcaption><span class="yr"><span class="tbc">[Year]</span></span><span class="cap">Meeting the families</span><span class="cap-ne">परिवारसँगको भेट</span></figcaption></figure></li>
+      <li><figure class="print rv"><div class="ph"><img src="story/4.jpg" alt="" loading="lazy"></div>
+        <figcaption><span class="yr"><span class="tbc">[Year]</span></span><span class="cap">The proposal</span><span class="cap-ne">विवाहको प्रस्ताव</span></figcaption></figure></li>
+      <li><figure class="print rv"><div class="ph"><img src="story/5.jpg" alt="" loading="lazy"></div>
+        <figcaption><span class="yr">2027</span><span class="cap">And now, Darjeeling</span><span class="cap-ne">अब, दार्जिलिङमा</span></figcaption></figure></li>
+    </ol>
+  </aside>
+
+  <div class="invite">
+  <section class="panel rv" id="details" aria-labelledby="dTitle">
   <div class="paper" aria-hidden="true"><i class="rim"></i><i class="face"></i></div>
     <p class="kicker">The celebrations</p>
     <h2 class="h2" id="dTitle">Two days to be with us</h2>
@@ -479,7 +630,59 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     <div class="hem" aria-hidden="true"></div>
   </section>
 
-  <section class="panel rsvp" id="rsvp" aria-labelledby="rTitle">
+  <section class="panel travel rv" id="travel" aria-labelledby="tTitle">
+  <div class="paper" aria-hidden="true"><i class="rim"></i><i class="face"></i></div>
+    <p class="kicker">Getting here</p>
+    <h2 class="h2" id="tTitle">Coming from abroad? Fly to Bagdogra.</h2>
+    <p class="h2-ne">विदेशबाट आउने पाहुनाहरूका लागि</p>
+    <p class="intro">Bagdogra is the airport for Darjeeling. Land there and we will meet you at arrivals and drive you up into the hills.</p>
+    <p class="intro-ne">बागडोगरा विमानस्थलसम्म आउनुहोस्, त्यहाँबाट हामी तपाईंलाई लिन आउनेछौं।</p>
+
+    <figure class="route rv" style="margin-inline:0">
+      <svg viewBox="-10 -46 660 268" role="img" aria-label="The road climbs from Bagdogra airport at 126 metres, through Kurseong at about 1,480 metres, to Darjeeling at about 2,040 metres.">
+        <path class="ground" d="M-10 222 L-10 188 L205 188 L252 176 L300 138 L352 113 L400 108 L470 96 L500 74 L548 60 L600 54 L650 52 L650 222 Z"/>
+        <path class="road" pathLength="1" d="M30 180 L200 180 C222 179 236 174 246 168 L226 161 L266 150 L246 143 L290 131 L270 123 L318 115 L300 108 L350 104 L400 100 C440 96 462 90 482 82 L462 76 L512 66 L494 60 L542 53 L600 46"/>
+        <circle class="stop" cx="30" cy="180" r="7" style="--at:.2s"/>
+        <circle class="stop" cx="400" cy="100" r="7" style="--at:1.4s"/>
+        <circle class="stop end" cx="600" cy="46" r="9" style="--at:2.4s"/>
+        <text class="big" x="22" y="122" style="--at:.3s">Bagdogra airport</text>
+        <text class="alt" x="22" y="152" style="--at:.4s">126 m<tspan class="long"> · you land here</tspan></text>
+        <text class="big" x="408" y="50" text-anchor="end" style="--at:1.5s">Kurseong</text>
+        <text class="alt" x="408" y="78" text-anchor="end" style="--at:1.6s">about 1,480 m</text>
+        <text class="big" x="616" y="-12" text-anchor="end" style="--at:2.5s">Darjeeling</text>
+        <text class="alt" x="616" y="16" text-anchor="end" style="--at:2.6s">about 2,040 m</text>
+      </svg>
+      <figcaption class="route-meta">About 65 km and roughly 3 hours by car, up through the tea gardens.</figcaption>
+    </figure>
+
+    <ol class="steps">
+      <li>
+        <h3>Fly into India</h3>
+        <p>Take an international flight to Delhi, Kolkata, Mumbai or Bengaluru. Most visitors need an Indian visa, and many nationalities can apply online at <a class="link" style="margin:0" href="https://indianvisaonline.gov.in/" target="_blank" rel="noopener">indianvisaonline.gov.in</a>. Citizens of Nepal and Bhutan do not need one. Darjeeling needs no extra permit.</p>
+        <p class="ne">दिल्ली, कोलकाता, मुम्बई वा बेङ्गलुरुसम्म अन्तर्राष्ट्रिय उडान लिनुहोस्।</p>
+      </li>
+      <li>
+        <h3>Connect to Bagdogra</h3>
+        <p>Direct domestic flights link all four cities to Bagdogra (airport code IXB). Drukair also flies there from Bangkok and Paro.</p>
+        <p class="ne">त्यहाँबाट बागडोगरा (IXB) को सिधा उडान लिनुहोस्।</p>
+      </li>
+      <li>
+        <h3>We pick you up</h3>
+        <p>Add your flight number and landing time to your RSVP. One of us will be waiting at arrivals to drive you to Darjeeling.</p>
+        <p class="ne">आफ्नो उडानको विवरण पठाउनुहोस्, हामी विमानस्थलमै तपाईंलाई भेट्न आउनेछौं।</p>
+      </li>
+    </ol>
+
+    <div class="tips">
+      <p><b>Arrive by 9 February.</b> The wedding starts at 11 AM on the 10th, and the drive up takes most of a morning.</p>
+      <p><b>Land by early afternoon</b> if you can, so the hill road is done in daylight.</p>
+      <p><b>Bring warm layers.</b> February in Darjeeling is cold, especially at night.</p>
+    </div>
+    <a class="link" href="#rsvp" id="toRsvp">Add your flight to your RSVP</a>
+    <div class="hem" aria-hidden="true"></div>
+  </section>
+
+  <section class="panel rsvp rv" id="rsvp" aria-labelledby="rTitle">
   <div class="paper" aria-hidden="true"><i class="rim"></i><i class="face"></i></div>
     <p class="kicker">RSVP · optional</p>
     <h2 class="h2" id="rTitle">Let us know if you can come</h2>
@@ -531,6 +734,11 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
         </div>
       </div>
 
+      <div id="arriveRow">
+        <label class="lbl" for="arrive">Flying in? Your arrival (optional)</label>
+        <input type="text" id="arrive" name="arrive" autocomplete="off" placeholder="Flight number, date and landing time at Bagdogra">
+      </div>
+
       <div>
         <label class="lbl" for="msg">A note for us (optional)</label>
         <textarea id="msg" name="msg" placeholder="Anything you would like us to know"></textarea>
@@ -564,6 +772,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     </div>
     <div class="hem" aria-hidden="true"></div>
   </section>
+  </div>
 </div>
 
 <footer id="foot" hidden>
@@ -714,6 +923,65 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     requestAnimationFrame(step);
   });
 
+  /* ----- Countdown to 10 February 2027, 11:00 AM India time ----- */
+  (function countdown() {
+    var WEDDING = Date.UTC(2027, 1, 10, 5, 30); // 11:00 IST is 05:30 UTC
+    var box = $('count'), sr = $('countSr');
+    var cells = {};
+    Array.prototype.forEach.call(box.querySelectorAll('.cn'), function (c) { cells[c.getAttribute('data-u')] = c; });
+    var last = {}, lastSr = '';
+    function put(u, v) {
+      if (last[u] === v) return;
+      var cell = cells[u], cur = cell.lastElementChild;
+      if (reduce || last[u] === undefined) { cur.textContent = v; cur.className = ''; }
+      else {
+        Array.prototype.forEach.call(cell.querySelectorAll('.out'), function (o) { o.remove(); });
+        cur.className = 'out';
+        var nx = document.createElement('span');
+        nx.className = 'in'; nx.textContent = v;
+        cell.appendChild(nx);
+        setTimeout(function () { if (cur.parentNode) cur.remove(); }, 600);
+      }
+      last[u] = v;
+    }
+    function pad(n) { return n < 10 ? '0' + n : String(n); }
+    var timer;
+    function tick() {
+      var ms = WEDDING - Date.now();
+      if (ms <= 0) { box.hidden = true; $('countDone').hidden = false; clearInterval(timer); return; }
+      box.hidden = false;
+      var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+      put('d', String(d)); put('h', pad(h)); put('m', pad(m)); put('s', pad(s % 60));
+      var said = d + ' days, ' + h + ' hours and ' + m + ' minutes until the wedding';
+      if (said !== lastSr) { sr.textContent = said; lastSr = said; }
+    }
+    tick();
+    timer = setInterval(tick, 1000);
+  })();
+
+  /* ----- Things arrive as they scroll into view (panels unfold, photos settle, the road draws) ----- */
+  var rv = document.querySelectorAll('.rv');
+  if (!reduce && 'IntersectionObserver' in window) {
+    document.documentElement.classList.add('js');
+    var printN = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('.print'), function (p) { p.style.setProperty('--delay', (printN++ % 2) * 0.12 + 's'); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    Array.prototype.forEach.call(rv, function (el) { io.observe(el); });
+  }
+
+  /* ----- Story photos fade in once they have loaded; a missing photo keeps its placeholder ----- */
+  Array.prototype.forEach.call(document.querySelectorAll('.ph img'), function (img) {
+    function ok() { if (img.naturalWidth) img.classList.add('ok'); }
+    if (img.complete) { if (img.naturalWidth) ok(); else if (img.currentSrc) img.remove(); } else img.addEventListener('load', ok);
+    img.addEventListener('error', function () { img.remove(); });
+  });
+
   cue.addEventListener('click', function () {
     $('details').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   });
@@ -795,6 +1063,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
     var yes = $('replyYes').checked;
     $('eventsSet').style.display = $('replyNo').checked ? 'none' : '';
     $('partyRow').style.display = $('replyNo').checked ? 'none' : '';
+    $('arriveRow').style.display = $('replyNo').checked ? 'none' : '';
   }
   form.addEventListener('change', toggleAttend);
 
@@ -815,6 +1084,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
       lines.push('Celebrations: ' + evs.join(' and '));
       lines.push('Guests: ' + n);
       if ($('diet').value.trim()) lines.push('Food needs: ' + $('diet').value.trim());
+      if ($('arrive').value.trim()) lines.push('Arriving: ' + $('arrive').value.trim());
     } else {
       lines.push(name + ' regretfully declines.');
     }
@@ -851,7 +1121,8 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
       events: yes ? Array.prototype.map.call(form.querySelectorAll('input[name="ev"]:checked'), function (c) { return c.value; }).join(' and ') : '',
       guests: yes ? parseInt($('party').value, 10) : 0,
       diet: yes ? $('diet').value.trim() : '',
-      note: $('msg').value.trim()
+      // Arrival details ride along in the note, so the guest sheet script needs no change.
+      note: [yes && $('arrive').value.trim() ? 'Arriving: ' + $('arrive').value.trim() : '', $('msg').value.trim()].filter(Boolean).join('\n')
     };
     var btn = $('sendBtn');
     btn.disabled = true; btn.textContent = 'Sending...';

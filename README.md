@@ -26,10 +26,22 @@ The page works without `hero.mp4`. It shows a dusk scene behind the details unti
 Run `./tools/make-video.sh your-recording.mov` (needs ffmpeg), or send the recording to Claude to do it.
 Keep `hero.mp4` under about 10 MB so it loads quickly on phones. GitHub rejects files over 100 MB.
 
+## Add your story photos
+
+The "Our story" prints sit to the left of the invitation on computers and become a swipeable row on phones.
+
+1. Make a folder called `story` in the repository.
+2. Add five portrait photos named `1.jpg` to `5.jpg`, in the order of the story. About 1000 px tall and under 300 KB each keeps phones fast.
+3. Edit the years and captions in `index.html` (search for `[Year]`).
+
+Until a photo is there, its frame shows a dusk-coloured card that says "Photo to come".
+
 ## Things to know
 
 - The page is hidden from search engines (`noindex` in `index.html`). Anyone with the link can still open it.
 - The RSVP form sends replies to a Google Sheet through a small Apps Script. Setup steps are in `apps-script/README.md`. Until the `ENDPOINT` line in `index.html` is filled in, or if the script cannot be reached, the form falls back to preparing an email to the `RSVP_EMAIL` address.
 - Personal links end in `?g=CODE`. The page looks the code up in the sheet to greet the guest by name.
 - The repository is public, so the address, venue and reply email in the source are public too.
-- Still to fill in: the reception date, venue name and directions (dashed underlines on the page).
+- Still to fill in: the reception date, venue name and directions, and the story years (dashed underlines on the page).
+- The countdown runs to 10 February 2027, 11:00 AM India time. After that it changes to a thank-you line.
+- Arrival details typed into the RSVP form are saved at the start of the guest's note in the sheet, so the Apps Script needs no change.
