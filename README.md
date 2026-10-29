@@ -11,8 +11,10 @@ Plain HTML, CSS and JavaScript, so it runs on GitHub Pages with no build step.
 | `hero.mp4` | The looping background video (add it, see below) |
 | `.nojekyll` | Tells GitHub Pages to serve the files as they are |
 | `tools/make-video.sh` | Compresses your recording into `hero.mp4` |
+| `art/` | The watercolour lighthouse painting, in layers |
+| `tools/paint-scene.py` | Paints the layers in `art/` (run it again after changing colours or shapes) |
 
-The page works without `hero.mp4`. It shows a dusk scene behind the details until the video is added.
+The page opens on a watercolour painting of the same spot as the film: chalk cliff, banded lighthouse, golden grass. Pressing the button turns the beam towards the viewer and the light spreads like paint on wet paper, then clears to the video.
 
 ## Put it online
 
