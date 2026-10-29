@@ -1059,6 +1059,22 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     sel.value = String(max);
   }
 
+  // The greeting uses first names only: "Mr Ram Sharma" becomes "Ram", "Ram & Sita Sharma" becomes
+  // "Ram & Sita", and "Ram Sharma and family" becomes "Ram and family". A name like "Mr and Mrs Sharma"
+  // has no first name to use, so it stays as written. The RSVP form keeps the full name.
+  function firstNames(full) {
+    var TITLES = /^(mr|mrs|ms|miss|mx|dr|prof|sir|shri|shree|smt|sri|late)\.?$/i;
+    var parts = String(full).trim().split(/\s*(&|\+|\band\b)\s*/i);
+    var out = parts.map(function (p, i) {
+      if (i % 2) return /and/i.test(p) ? 'and' : '&';               // keep the joining word
+      var words = p.split(/\s+/).filter(function (w) { return w && !TITLES.test(w); });
+      if (!words.length) return '';
+      return /^famil(y|ies)$/i.test(words[0]) ? 'family' : words[0];
+    });
+    if (out.some(function (w, i) { return !(i % 2) && !w; })) return String(full).trim();
+    return out.join(' ').replace(/\s+/g, ' ').trim();
+  }
+
   // A personal link ends in ?g=CODE. Look the code up so the page can greet the guest by name.
   (function lookupGuest() {
     var m = /[?&]g=([A-Za-z0-9]{3,12})(?:&|$)/.exec(window.location.search);
@@ -1074,7 +1090,7 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
         clearTimeout(timer);
         if (!j || !j.ok || !j.name) { dbg('lookup: code not recognised'); guestCode = ''; return; }
         var g = $('greet');
-        g.textContent = 'Dear ' + j.name + ',';
+        g.textContent = 'Dear ' + firstNames(j.name) + ',';
         g.hidden = false;
         $('name').value = j.name;
         if (j.seats) setSeats(j.seats);
