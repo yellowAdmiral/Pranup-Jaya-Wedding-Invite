@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-side="both">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,14 @@
 <meta property="og:description" content="You are invited. 10 February 2027, Darjeeling.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%2314183A'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='30' fill='%23F2A900'%3EPJ%3C/text%3E%3C/svg%3E">
 <title>Pranup &amp; Jaya's Wedding</title>
+<script>
+// Which side of the family this guest is invited by: their link ends in &s=bride or &s=groom, otherwise both.
+// Set before anything is drawn so the right version shows straight away.
+(function () {
+  var m = /[?&]s=(bride|groom|both)(?:&|$)/i.exec(location.search);
+  document.documentElement.setAttribute('data-side', m ? m[1].toLowerCase() : 'both');
+})();
+</script>
 <link rel="preload" href="art/bg.webp" as="image" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,16 +65,7 @@ h1, h2, h3, p { margin: 0; }
 .world img, .world .layer, .world svg { position: absolute; display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
 .stage > .world { transition: opacity 1.6s ease; }
 .stage.filmon > .world { opacity: 0; visibility: hidden; transition: opacity 1.6s ease, visibility 0s 1.6s; }
-/* Portrait phones: the 16:9 film would be cropped to its middle quarter. The couple sit at ~73-92%
-   across and the lighthouse at ~43%, so show a square block anchored to the right, and fade it into the
-   dark area behind the text. */
-@media (max-aspect-ratio: 4/5) {
-  .film { bottom: auto; height: min(100vw, 62%); object-position: 83% 50%; }
-  .stage::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: min(100vw, 62%); pointer-events: none;
-    background: linear-gradient(to bottom, rgba(20, 24, 58, 0) 68%, var(--indigo) 100%); opacity: 0; transition: opacity 1.6s ease; }
-  .stage.filmon::after { opacity: 1; }
-  .stage.filmon { background: var(--indigo); }
-}
+
 /* Darken behind the words: from the left on wide screens, from the bottom on tall ones. */
 .shade { background:
   linear-gradient(to right, rgba(20,24,58,.5) 0%, rgba(20,24,58,.18) 45%, rgba(20,24,58,0) 65%),
@@ -265,6 +264,15 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 .back { margin-top: 12px; background: none; border: 1px solid rgba(251,245,230,.5); color: var(--ivory); font: 500 .85rem/1 var(--body); letter-spacing: .08em; padding: 14px 20px; min-height: 48px; cursor: pointer; border-radius: 999px; }
 .back:hover { background: rgba(251,245,230,.1); }
 
+/* ---------- Three versions: bride's side, groom's side, both ----------
+   Anything marked data-for shows only on the versions it lists. */
+html[data-side="bride"] [data-for]:not([data-for~="bride"]),
+html[data-side="groom"] [data-for]:not([data-for~="groom"]),
+html[data-side="both"] [data-for]:not([data-for~="both"]) { display: none !important; }
+.hosts { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.1rem, 3.2vw, 1.45rem); line-height: 1.3;
+  color: var(--ivory-dim); text-shadow: 0 2px 14px rgba(20,24,58,.6); max-width: 42ch; margin-bottom: -6px; }
+.hosts .tbc { border-bottom-width: 1.5px; }
+
 /* ---------- Motion vocabulary ----------
    One easing for everything that arrives, so the page moves as one hand.
    Only opacity and transform are animated, which phones handle cheaply. */
@@ -282,8 +290,9 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 .count { animation: enter 1s var(--ease) 1.9s backwards; }
 .hero-copy > .cta-wrap { animation: enter 1s var(--ease) 2.1s backwards; }
 .greet { animation: enter 1s var(--ease) .2s backwards; }
+.hosts { animation: enter 1s var(--ease) .3s backwards; }
 @media (prefers-reduced-motion: reduce) {
-  .hero-top, .names, .names-ne, .when, .count, .hero-copy > .cta-wrap, .greet { animation: none; }
+  .hero-top, .names, .names-ne, .when, .count, .hero-copy > .cta-wrap, .greet, .hosts { animation: none; }
 }
 
 /* ---------- Countdown ---------- */
@@ -354,6 +363,7 @@ footer .ne { font-family: var(--deva); font-style: normal; font-size: .95rem; co
 .route .alt { font-size: 12.5px; fill: var(--teal); }
 .route .big { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 21px; }
 @media (max-width: 600px) { .route text { font-size: 24px; } .route .big { font-size: 34px; } .route .alt { font-size: 23px; } .route .long { display: none; } }
+.route-meta.solo { margin-top: 30px; }
 .route-meta { margin-top: 6px; font-family: var(--display); font-style: italic; font-size: 1.2rem; }
 .steps { list-style: none; margin: 36px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 26px; counter-reset: step; }
 .steps li { counter-increment: step; border-top: 1px solid rgba(20, 24, 58, .45); padding-top: 16px; display: grid; gap: 6px; align-content: start; }
@@ -383,6 +393,118 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
   html.js .rv:not(.in), html.js .route.rv:not(.in) .stop, html.js .route.rv:not(.in) text { opacity: 1; }
   html.js .route.rv:not(.in) .road { stroke-dashoffset: 0; }
   html.js .rv.in, html.js .rv.in .road, html.js .rv.in .stop, html.js .rv.in text { animation: none !important; }
+}
+
+/* ---------- RSVP pieces ---------- */
+.who { font-size: 1.05rem; }
+.who b { font-weight: 500; }
+.linkbtn { background: none; border: 0; padding: 6px 2px; min-height: 44px; font: inherit; color: var(--indigo); cursor: pointer;
+  text-decoration: underline; text-decoration-color: var(--marigold); text-underline-offset: 5px; text-decoration-thickness: 2px; }
+fieldset.single { display: none !important; }
+.stepper { display: inline-flex; align-items: stretch; border: 1.5px solid var(--indigo); background: #FFFCF3; }
+.step { width: 60px; min-height: 56px; border: 0; background: none; font: 400 1.7rem/1 var(--body); color: var(--indigo); cursor: pointer; }
+.step:disabled { opacity: .3; cursor: default; }
+.step:not(:disabled):active { background: var(--ivory-dim); }
+.stepper output { min-width: 64px; display: grid; place-items: center; font-family: var(--display); font-weight: 600; font-size: 1.7rem;
+  border-inline: 1.5px solid var(--indigo); }
+.more { border-top: 1px solid rgba(20, 24, 58, .3); border-bottom: 1px solid rgba(20, 24, 58, .3); }
+.more summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 56px; padding: 8px 2px; font-size: 1rem; font-weight: 500; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary::after { content: "+"; font: 400 1.6rem/1 var(--body); color: var(--teal); transition: transform .3s var(--ease); }
+.more[open] summary::after { transform: rotate(45deg); }
+.more-body { display: grid; gap: 22px; padding: 6px 0 22px; }
+
+/* A quick way back to the RSVP once the details are open (phones). */
+.fab { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 6; display: none;
+  align-items: center; gap: 8px; padding: 0 22px; min-height: 52px; border-radius: 999px; background: var(--marigold); color: var(--indigo);
+  font: 500 1rem/1 var(--body); letter-spacing: .04em; text-decoration: none; box-shadow: 0 10px 26px rgba(10, 12, 36, .4);
+  transform: translateY(140%); visibility: hidden; transition: transform .45s var(--ease), visibility 0s .45s; }
+.fab.show { transform: none; visibility: visible; transition: transform .45s var(--ease); }
+
+/* ---------- Phones ----------
+   Most guests open the invite from a message on a phone, often inside WhatsApp's own browser,
+   which leaves less height than the phone has. So: the main button always sits at the bottom of the
+   first screen, within reach of a thumb; after the reveal the film fills the screen; and the
+   details read as full-width pages with larger text. */
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .fab { display: inline-flex; }
+  .pause { position: absolute; }   /* stays with the film instead of floating over the details */
+
+  /* Landing */
+  .hero { padding-top: 14px; padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
+  .pj-hero { width: 92px; }
+  .hero-copy { gap: 10px; }
+  .names { font-size: clamp(3.1rem, 15vw, 4.4rem); line-height: 1.05; }
+  .names-ne { font-size: 1.35rem; }
+  .when { font-size: 1.2rem; }
+  .cn { font-size: 1.85rem; }
+  .cu { padding-right: 12px; margin-right: 12px; }
+  .cl { font-size: .74rem; letter-spacing: .03em; }
+  .hero-copy > .cta-wrap { position: fixed; left: 16px; right: 16px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 5;
+    align-items: stretch; gap: 6px; margin: 0; }
+  .cta { width: 100%; justify-content: center; min-height: 60px; font-size: 1.08rem; box-shadow: 0 12px 30px rgba(10, 12, 36, .5); }
+  .cta-ne { text-align: center; text-shadow: 0 1px 8px rgba(20, 24, 58, .9); }
+  .hero.leaving .hero-top, .hero.leaving .hero-copy { transform: none; }
+
+  /* Short screens, such as a phone browser inside WhatsApp */
+  @media (max-height: 700px) {
+    .hero-copy { gap: 6px; }
+    .hosts { font-size: 1rem; }
+    .names { font-size: clamp(2.7rem, 13vw, 3.4rem); }
+    .names-ne { font-size: 1.15rem; }
+    .when { font-size: 1.05rem; }
+    .cn { font-size: 1.6rem; }
+    .pj-hero { width: 76px; }
+  }
+
+  /* After the reveal: the film fills the screen, the names move up into the sky, and the couple stay clear. */
+  .hero.entered { justify-content: flex-start; gap: 18px; padding-bottom: 28px; }
+  .hero.entered .hosts, .hero.entered .count, .hero.entered .count-done, .hero.entered .greet { display: none; }
+  .hero.entered .names { font-size: clamp(2.6rem, 12vw, 3.4rem); }
+  .hero.entered .hero-copy { flex: 1; }
+  .hero.entered .cue-wrap { margin-top: auto; align-self: stretch; align-items: center; }
+  .cue { font-size: 1.05rem; text-shadow: 0 1px 10px rgba(20, 24, 58, .9); }
+
+  /* Details: full-width sheets, lighter borders, bigger text */
+  .sheet { padding-inline: 0; padding-bottom: 96px; row-gap: 22px; }
+  .invite { gap: 22px; }
+  .panel { --pad: 24px; padding: 22px 22px 30px; scroll-margin-top: 12px; }
+  .paper i { inset: 4px 0; }
+  .panel::before, .hem { height: 45px; background-size: 18px 45px; }
+  .panel::before { margin: 0 0 22px; }
+  .hem { margin-top: 26px; margin-bottom: -8px; }
+  .kicker { font-size: .74rem; }
+  .h2 { font-size: 2.05rem; }
+  .intro { font-size: 1.22rem; }
+  .intro-ne { font-size: .98rem; }
+  .events { margin-top: 26px; gap: 8px; }
+  .event { padding-top: 18px; }
+  .date { font-size: 1.6rem; margin-top: 8px; }
+  .line { font-size: 1.05rem; }
+  .note, .steps p, .tips p { font-size: 1rem; }
+  .steps { margin-top: 28px; gap: 22px; }
+  .tips { padding: 16px 16px; }
+  form { gap: 24px; margin-top: 26px; }
+  .btn[type="submit"] { width: 100%; justify-self: stretch; }
+  .choices { gap: 10px; }
+
+  /* Our story comes after the RSVP on phones, so the details come first. */
+  .story { order: 2; margin-inline: 0; }
+}
+
+/* Tall screens: the film is cropped to the screen's height and drifts slowly from the lighthouse
+   to the two of you, so both are seen. Only transform moves, so it stays smooth. */
+@media (max-aspect-ratio: 4/5) {
+  .film { right: auto; width: auto; aspect-ratio: 16 / 9; height: 100%; object-fit: cover;
+    animation: pan 22s ease-in-out infinite alternate; }
+  @keyframes pan { from { transform: translateX(calc(50vw - 82%)); } to { transform: translateX(calc(50vw - 46%)); } }
+  .stage.filmon .shade { background: linear-gradient(to bottom, rgba(20,24,58,.62) 0%, rgba(20,24,58,.18) 30%, rgba(20,24,58,0) 45%,
+    rgba(20,24,58,0) 72%, rgba(20,24,58,.6) 100%); }
+}
+@media (max-aspect-ratio: 4/5) and (prefers-reduced-motion: reduce) {
+  .film { animation: none; transform: translateX(calc(50vw - 80%)); }
 }
 </style>
 
@@ -553,15 +675,25 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
 </div>
 
 <button class="pause" id="pause" type="button" hidden aria-pressed="false">Pause video</button>
+<a class="fab" id="fab" href="#rsvp" aria-label="Go to the RSVP">RSVP</a>
 
 <header class="hero" id="top">
   <svg class="pj pj-hero hero-top" role="img" aria-label="Pranup and Jaya monogram, 10 02 2027"><use href="#pj"/></svg>
   <div class="hero-copy" id="heroCopy">
     <p class="greet" id="greet" hidden></p>
-    <!-- <p class="eyebrow">Together with our families</p> -->
+    <!-- Who the invitation is from. Replace the bracketed names with the parents' names. -->
+    <p class="hosts">
+      <span data-for="bride"><span class="tbc">[Jaya's parents]</span> invite you to the wedding of</span>
+      <span data-for="groom"><span class="tbc">[Pranup's parents]</span> invite you to the wedding reception of</span>
+      <span data-for="both"><span class="tbc">[Jaya's parents]</span> and <span class="tbc">[Pranup's parents]</span> invite you to the wedding of</span>
+    </p>
     <h1 class="names" id="names" tabindex="-1">Pranup &amp; Jaya</h1>
     <p class="names-ne">प्रनुप र जया</p>
-    <p class="when">are tying the knot · 10 February 2027 · Darjeeling</p>
+    <p class="when">
+      <span data-for="bride">Wednesday, 10 February 2027 · Darjeeling</span>
+      <span data-for="groom"><span class="tbc">[12 / 13]</span> February 2027 · Gorubathan</span>
+      <span data-for="both">10 February 2027 · Darjeeling &amp; Gorubathan</span>
+    </p>
     <div class="count" id="count" role="timer" hidden>
       <p class="sr" id="countSr" aria-live="off"></p>
       <div class="cu" aria-hidden="true"><span class="cn" data-u="d"><span></span></span><span class="cl">days</span><span class="cl-ne">दिन</span></div>
@@ -569,7 +701,10 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
       <div class="cu" aria-hidden="true"><span class="cn" data-u="m"><span></span></span><span class="cl">minutes</span><span class="cl-ne">मिनेट</span></div>
       <div class="cu" aria-hidden="true"><span class="cn" data-u="s"><span></span></span><span class="cl">seconds</span><span class="cl-ne">सेकेन्ड</span></div>
     </div>
-    <p class="count-done" id="countDone" hidden>Married on 10 February 2027. Thank you for celebrating with us.</p>
+    <p class="count-done" id="countDone" hidden>
+      <span data-for="bride both">Married on 10 February 2027. Thank you for celebrating with us.</span>
+      <span data-for="groom">Thank you for celebrating with us.</span>
+    </p>
     <div class="cta-wrap">
       <button class="cta" id="reveal" type="button" aria-controls="sheet">
         <span>Reveal the details</span>
@@ -613,14 +748,16 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
   <div class="invite">
   <section class="panel rv" id="details" aria-labelledby="dTitle">
   <div class="paper" aria-hidden="true"><i class="rim"></i><i class="face"></i></div>
-    <p class="kicker">The celebrations</p>
-    <h2 class="h2" id="dTitle">Two days to be with us</h2>
-    <p class="h2-ne">उत्सवका दिनहरू</p>
+    <p class="kicker"><span data-for="bride">The wedding</span><span data-for="groom">The reception</span><span data-for="both">The celebrations</span></p>
+    <h2 class="h2" id="dTitle"><span data-for="bride">Join us for our wedding</span><span data-for="groom">Join us for our reception</span><span data-for="both">Two days to be with us</span></h2>
+    <p class="h2-ne"><span data-for="bride">विवाह समारोह</span><span data-for="groom">स्वागत समारोह</span><span data-for="both">उत्सवका दिनहरू</span></p>
     <p class="intro">With joy in our hearts, we invite you to celebrate our wedding.</p>
-    <p class="intro-ne">हामी विवाह बन्धनमा बाँधिँदै छौं, र यो खुशीको क्षणमा सहभागी हुन तपाईंलाई हार्दिक निमन्त्रणा गर्दछौं।</p>
+    <p class="intro-ne" data-for="bride"><span class="tbc">[जयाका आमाबुबा]</span> आफ्नी छोरी जयाको विवाहमा तपाईंलाई हार्दिक निमन्त्रणा गर्नुहुन्छ।</p>
+    <p class="intro-ne" data-for="groom"><span class="tbc">[प्रनुपका आमाबुबा]</span> आफ्नो छोरा प्रनुपको विवाहको स्वागत समारोहमा तपाईंलाई हार्दिक निमन्त्रणा गर्नुहुन्छ।</p>
+    <p class="intro-ne" data-for="both">हामी विवाह बन्धनमा बाँधिँदै छौं, र यो खुशीको क्षणमा सहभागी हुन तपाईंलाई हार्दिक निमन्त्रणा गर्दछौं।</p>
 
     <div class="events">
-      <article class="event">
+      <article class="event" data-for="bride both">
         <p class="label">Wedding</p>
         <p class="label-ne">विवाह समारोह</p>
         <p class="date">Wednesday, 10 February 2027</p>
@@ -633,7 +770,7 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
         <a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=Gymkhana+Darjeeling+West+Bengal" target="_blank" rel="noopener">Open in Google Maps</a>
       </article>
 
-      <article class="event alt">
+      <article class="event alt" data-for="groom both">
         <p class="label">Reception</p>
         <p class="label-ne">स्वागत समारोह</p>
         <p class="date"><span class="tbc">[Friday 12 / Saturday 13]</span> February 2027</p>
@@ -655,10 +792,10 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     <p class="kicker">Getting here</p>
     <h2 class="h2" id="tTitle">Coming from abroad? Fly to Bagdogra.</h2>
     <p class="h2-ne">विदेशबाट आउने पाहुनाहरूका लागि</p>
-    <p class="intro">Bagdogra is the airport for Darjeeling. Land there and we will meet you at arrivals and drive you up into the hills.</p>
+    <p class="intro">Bagdogra is the airport for <span data-for="bride both">Darjeeling</span><span data-for="groom">Gorubathan</span>. Land there and we will meet you at arrivals and drive you up into the hills.</p>
     <p class="intro-ne">बागडोगरा विमानस्थलसम्म आउनुहोस्, त्यहाँबाट हामी तपाईंलाई लिन आउनेछौं।</p>
 
-    <figure class="route rv" style="margin-inline:0">
+    <figure class="route rv" style="margin-inline:0" data-for="bride both">
       <svg viewBox="-10 -46 660 268" role="img" aria-label="The road climbs from Bagdogra airport at 126 metres, through Kurseong at about 1,480 metres, to Darjeeling at about 2,040 metres.">
         <path class="ground" d="M-10 222 L-10 188 L205 188 L252 176 L300 138 L352 113 L400 108 L470 96 L500 74 L548 60 L600 54 L650 52 L650 222 Z"/>
         <path class="road" pathLength="1" d="M30 180 L200 180 C222 179 236 174 246 168 L226 161 L266 150 L246 143 L290 131 L270 123 L318 115 L300 108 L350 104 L400 100 C440 96 462 90 482 82 L462 76 L512 66 L494 60 L542 53 L600 46"/>
@@ -674,11 +811,13 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
       </svg>
       <figcaption class="route-meta">About 65 km and roughly 3 hours by car, up through the tea gardens.</figcaption>
     </figure>
+    <p class="route-meta" data-for="both">For the reception, Gorubathan is about 90 km from Bagdogra, roughly 3 hours by car through Malbazar.</p>
+    <p class="route-meta solo" data-for="groom">Gorubathan is about 90 km from Bagdogra, roughly 3 hours by car through Malbazar.</p>
 
     <ol class="steps">
       <li>
         <h3>Fly into India</h3>
-        <p>Take an international flight to Delhi, Kolkata, Mumbai or Bengaluru. Most visitors need an Indian visa, and many nationalities can apply online at <a class="link" style="margin:0" href="https://indianvisaonline.gov.in/" target="_blank" rel="noopener">indianvisaonline.gov.in</a>. Citizens of Nepal and Bhutan do not need one. Darjeeling needs no extra permit.</p>
+        <p>Take an international flight to Delhi, Kolkata, Mumbai or Bengaluru. Most visitors need an Indian visa, and many nationalities can apply online at <a class="link" style="margin:0" href="https://indianvisaonline.gov.in/" target="_blank" rel="noopener">indianvisaonline.gov.in</a>. Citizens of Nepal and Bhutan do not need one.<span data-for="bride both"> Darjeeling needs no extra permit.</span></p>
         <p class="ne">दिल्ली, कोलकाता, मुम्बई वा बेङ्गलुरुसम्म अन्तर्राष्ट्रिय उडान लिनुहोस्।</p>
       </li>
       <li>
@@ -688,15 +827,17 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
       </li>
       <li>
         <h3>We pick you up</h3>
-        <p>Add your flight number and landing time to your RSVP. One of us will be waiting at arrivals to drive you to Darjeeling.</p>
+        <p>Add your flight number and landing time to your RSVP. One of us will be waiting at arrivals to drive you to <span data-for="bride both">Darjeeling</span><span data-for="groom">Gorubathan</span>.</p>
         <p class="ne">आफ्नो उडानको विवरण पठाउनुहोस्, हामी विमानस्थलमै तपाईंलाई भेट्न आउनेछौं।</p>
       </li>
     </ol>
 
     <div class="tips">
-      <p><b>Arrive by 9 February.</b> The wedding starts at 11 AM on the 10th, and the drive up takes most of a morning.</p>
-      <p><b>Land by early afternoon</b> if you can, so the hill road is done in daylight.</p>
-      <p><b>Bring warm layers.</b> February in Darjeeling is cold, especially at night.</p>
+      <p data-for="bride both"><b>Arrive by 9 February.</b> The wedding starts at 11 AM on the 10th, and the drive up takes most of a morning.</p>
+      <p data-for="groom"><b>Arrive the day before the reception.</b> It starts at 11 AM, and the drive takes about 3 hours.</p>
+      <p><b>Land by early afternoon</b> if you can, so the drive is done in daylight.</p>
+      <p data-for="bride both"><b>Bring warm layers.</b> February in Darjeeling is cold, especially at night.</p>
+      <p data-for="groom"><b>Bring a warm layer.</b> February evenings in the hills are cool.</p>
     </div>
     <a class="link" href="#rsvp" id="toRsvp">Add your flight to your RSVP</a>
     <div class="hem" aria-hidden="true"></div>
@@ -707,7 +848,7 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     <p class="kicker">RSVP · optional</p>
     <h2 class="h2" id="rTitle">Let us know if you can come</h2>
     <p class="h2-ne">उपस्थिति जनाउनुहोस्</p>
-    <p class="intro">Replying helps us plan, but there is no pressure. Fill this in and your reply reaches us right away.</p>
+    <p class="intro">It takes a few seconds and helps us plan. There is no pressure.</p>
     <p class="note" id="repliedNote" hidden>We already have a reply from you. Sending this again will replace it.</p>
 
     <form id="form" novalidate>
@@ -720,7 +861,8 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
         <p class="err" id="errReply" role="alert"></p>
       </fieldset>
 
-      <div>
+      <p class="who" id="who" hidden>Replying for <b id="whoName"></b>. <button type="button" class="linkbtn" id="notYou">Not you?</button></p>
+      <div id="nameRow">
         <label class="lbl" for="name">Your name</label>
         <input type="text" id="name" name="name" autocomplete="name" placeholder="As on the invitation">
         <p class="err" id="errName" role="alert"></p>
@@ -729,16 +871,20 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
       <fieldset id="eventsSet">
         <legend>Which celebrations?</legend>
         <div class="choices">
-          <label class="choice sq"><input type="checkbox" name="ev" value="Wedding, 10 February 2027, Darjeeling" id="evW"><span><b>Wedding</b>&nbsp;<small>10 Feb, Darjeeling</small></span></label>
-          <label class="choice sq"><input type="checkbox" name="ev" value="Reception, Gorubathan" id="evR"><span><b>Reception</b>&nbsp;<small>Gorubathan</small></span></label>
+          <label class="choice sq" data-for="bride both"><input type="checkbox" name="ev" value="Wedding, 10 February 2027, Darjeeling" id="evW"><span><b>Wedding</b>&nbsp;<small>10 Feb, Darjeeling</small></span></label>
+          <label class="choice sq" data-for="groom both"><input type="checkbox" name="ev" value="Reception, Gorubathan" id="evR"><span><b>Reception</b>&nbsp;<small>Gorubathan</small></span></label>
         </div>
         <p class="err" id="errEv" role="alert"></p>
       </fieldset>
 
-      <div class="row" id="partyRow">
-        <div>
-          <label class="lbl" for="party">Number of guests</label>
-          <select id="party" name="party">
+      <div id="partyRow">
+        <p class="lbl" id="partyLbl">How many of you are coming?</p>
+        <div class="stepper" role="group" aria-labelledby="partyLbl">
+          <button type="button" class="step" id="minus" aria-label="One fewer">&minus;</button>
+          <output id="partyOut" aria-live="polite">1</output>
+          <button type="button" class="step" id="plus" aria-label="One more">+</button>
+        </div>
+        <select id="party" name="party" class="sr" tabindex="-1" aria-hidden="true">
             <option value="1">1 (just me)</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -747,22 +893,25 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
             <option value="6">6</option>
             <option value="7">7 or more</option>
           </select>
-        </div>
-        <div>
-          <label class="lbl" for="diet">Food needs</label>
-          <input type="text" id="diet" name="diet" placeholder="Vegetarian, allergies, none">
-        </div>
       </div>
 
-      <div id="arriveRow">
-        <label class="lbl" for="arrive">Flying in? Your arrival (optional)</label>
-        <input type="text" id="arrive" name="arrive" autocomplete="off" placeholder="Flight number, date and landing time at Bagdogra">
-      </div>
-
-      <div>
-        <label class="lbl" for="msg">A note for us (optional)</label>
-        <textarea id="msg" name="msg" placeholder="Anything you would like us to know"></textarea>
-      </div>
+      <details class="more" id="more">
+        <summary>Add food needs, your flight or a note</summary>
+        <div class="more-body">
+          <div id="dietRow">
+            <label class="lbl" for="diet">Food needs</label>
+            <input type="text" id="diet" name="diet" placeholder="Vegetarian, allergies, none">
+          </div>
+          <div id="arriveRow">
+            <label class="lbl" for="arrive">Flying in? Your arrival</label>
+            <input type="text" id="arrive" name="arrive" autocomplete="off" placeholder="Flight number, date and landing time at Bagdogra">
+          </div>
+          <div>
+            <label class="lbl" for="msg">A note for us</label>
+            <textarea id="msg" name="msg" placeholder="Anything you would like us to know"></textarea>
+          </div>
+        </div>
+      </details>
 
       <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
 
@@ -829,7 +978,7 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     var t = Math.min(1, Math.max(0, (a - 0.46) / (1.2 - 0.46)));
     var vw = 440 + (1000 - 440) * t;
     var vh = vw / a;
-    var hz = 0.54 + 0.08 * t;
+    var hz = 0.42 + 0.2 * t;   // on tall phones the horizon sits higher, leaving the sea for the words
     return { x: 1040 - vw, y: 470 - hz * vh, w: vw, h: vh, a: a };
   }
   function frame() {
@@ -948,9 +1097,25 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     requestAnimationFrame(step);
   });
 
-  /* ----- Countdown to 10 February 2027, 11:00 AM India time ----- */
+  /* ----- Which version: bride's side, groom's side or both ----- */
+  // The link sets it before the page draws (see the script in <head>); the guest sheet has the final say.
+  function side() { return document.documentElement.getAttribute('data-side') || 'both'; }
+  function applySide(sd) {
+    if (!/^(bride|groom|both)$/.test(sd)) return;
+    document.documentElement.setAttribute('data-side', sd);
+    // Only the celebrations this guest is invited to can be ticked; with just one, it is ticked for them.
+    var boxes = [['evW', sd !== 'groom'], ['evR', sd !== 'bride']];
+    boxes.forEach(function (b) { if (!b[1]) $(b[0]).checked = false; });
+    var shown = boxes.filter(function (b) { return b[1]; });
+    if (shown.length === 1) $(shown[0][0]).checked = true;
+    $('eventsSet').classList.toggle('single', shown.length === 1);
+  }
+  applySide(side());
+
+  /* ----- Countdown to the guest's celebration, 11:00 AM India time ----- */
   (function countdown() {
-    var WEDDING = Date.UTC(2027, 1, 10, 5, 30); // 11:00 IST is 05:30 UTC
+    var WEDDING = Date.UTC(2027, 1, 10, 5, 30);   // 10 Feb, 11:00 IST is 05:30 UTC
+    var RECEPTION = Date.UTC(2027, 1, 12, 5, 30); // [12 or 13 Feb, to confirm] 11:00 IST
     var box = $('count'), sr = $('countSr');
     var cells = {};
     Array.prototype.forEach.call(box.querySelectorAll('.cn'), function (c) { cells[c.getAttribute('data-u')] = c; });
@@ -972,7 +1137,7 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     function pad(n) { return n < 10 ? '0' + n : String(n); }
     var timer;
     function tick() {
-      var ms = WEDDING - Date.now();
+      var ms = (side() === 'groom' ? RECEPTION : WEDDING) - Date.now();
       if (ms <= 0) { box.hidden = true; $('countDone').hidden = false; clearInterval(timer); return; }
       box.hidden = false;
       var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
@@ -1023,6 +1188,20 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     try { reveal.focus({ preventScroll: true }); } catch (e) {}
   });
 
+  /* ----- The RSVP shortcut shows once the guest is past the opening screen, and hides at the form ----- */
+  (function fab() {
+    var btn = $('fab'), heroIn = true, rsvpIn = false, done = false;
+    function upd() { btn.classList.toggle('show', entered && !heroIn && !rsvpIn && !done); }
+    if (!('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function (e) { heroIn = e[0].isIntersecting; upd(); }, { threshold: 0.25 }).observe(hero);
+    new IntersectionObserver(function (e) { rsvpIn = e[0].isIntersecting; upd(); }, { threshold: 0.05 }).observe($('rsvp'));
+    btn.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      $('rsvp').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    });
+    window.fabDone = function () { done = true; upd(); };
+  })();
+
   /* ----- RSVP: sends the reply to the guest sheet; falls back to an email draft ----- */
   // Paste the Google Apps Script web app address between the quotes (see apps-script/README.md).
   // While it is empty the form keeps working the old way: it prepares an email.
@@ -1057,7 +1236,34 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
       sel.appendChild(o);
     }
     sel.value = String(max);
+    setParty(max);
   }
+
+  // The guest count is a big minus / plus pair; the select underneath still holds the value.
+  function setParty(v) {
+    var sel = $('party'), max = sel.options.length;
+    v = Math.max(1, Math.min(max, v));
+    sel.value = String(v);
+    $('partyOut').textContent = /or more/.test(sel.options[v - 1].textContent) ? v + '+' : String(v);
+    $('minus').disabled = v <= 1;
+    $('plus').disabled = v >= max;
+  }
+  $('minus').addEventListener('click', function () { setParty(parseInt($('party').value, 10) - 1); });
+  $('plus').addEventListener('click', function () { setParty(parseInt($('party').value, 10) + 1); });
+  setParty(1);
+
+  // A guest who came from their personal link doesn't need to type their name.
+  function knownGuest(name) {
+    $('whoName').textContent = name;
+    $('who').hidden = false;
+    $('nameRow').hidden = true;
+  }
+  $('notYou').addEventListener('click', function () {
+    $('who').hidden = true;
+    $('nameRow').hidden = false;
+    $('name').value = '';
+    $('name').focus();
+  });
 
   // The greeting uses first names only: "Mr Ram Sharma" becomes "Ram", "Ram & Sita Sharma" becomes
   // "Ram & Sita", and "Ram Sharma and family" becomes "Ram and family". A name like "Mr and Mrs Sharma"
@@ -1093,7 +1299,9 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
         g.textContent = 'Dear ' + firstNames(j.name) + ',';
         g.hidden = false;
         $('name').value = j.name;
+        knownGuest(j.name);
         if (j.seats) setSeats(j.seats);
+        if (j.side) applySide(j.side);
         if (j.replied) $('repliedNote').hidden = false;
       })
       .catch(function (err) { clearTimeout(timer); dbg('lookup failed: ' + (err && err.name) + ': ' + (err && err.message)); guestCode = ''; });
@@ -1104,6 +1312,7 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     $('eventsSet').style.display = $('replyNo').checked ? 'none' : '';
     $('partyRow').style.display = $('replyNo').checked ? 'none' : '';
     $('arriveRow').style.display = $('replyNo').checked ? 'none' : '';
+    $('dietRow').style.display = $('replyNo').checked ? 'none' : '';
   }
   form.addEventListener('change', toggleAttend);
 
@@ -1197,6 +1406,7 @@ html.js .route.rv.in .stop, html.js .route.rv.in text { transform-box: fill-box;
     result.hidden = true;
     form.hidden = true;
     thanks.hidden = false;
+    if (window.fabDone) window.fabDone();
     thanks.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
   }
 

@@ -30,3 +30,8 @@ Editing `Code.gs` does nothing for guests until you redeploy: **Deploy > Manage 
 
 - The Web app URL is visible in the page source. Anyone who has it could submit a reply or check a code, so keep codes private to each guest.
 - If the script cannot be reached, the form shows the old email draft so no reply is lost.
+
+## Sides (bride, groom, both)
+
+Column I on the Guests tab says which side invited the guest. The invite link already carries it, so nothing else is needed.
+If you change someone's side after sending their link, paste the latest `Code.gs` and redeploy (see above): the page then takes the side from the sheet, whatever the link says.

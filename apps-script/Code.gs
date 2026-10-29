@@ -1,17 +1,18 @@
 /**
  * Wedding RSVP receiver.
  * Lives inside the guest-list Google Sheet (Extensions > Apps Script) and does two jobs:
- *   GET  ?g=CODE  -> tells the invite page who the code belongs to (name and seats)
+ *   GET  ?g=CODE  -> tells the invite page who the code belongs to (name, seats and side)
  *   POST          -> saves a reply on the "Replies" tab and marks the guest on the "Guests" tab
  *
  * Tabs it expects:
- *   Guests  columns: A Code, B Guest name(s), C Seats, ... H Replied?
+ *   Guests  columns: A Code, B Guest name(s), C Seats, ... H Replied?, I Side (Bride, Groom or Both)
  *   Replies created automatically; one row per guest code, newest answer wins.
  */
 
 var GUESTS_TAB = 'Guests';
 var REPLIES_TAB = 'Replies';
 var REPLIED_COLUMN = 8;            // column H on the Guests tab
+var SIDE_COLUMN = 9;               // column I: Bride, Groom or Both (blank counts as Both)
 var REQUIRE_VALID_CODE = true;     // true: only guests with a real code from the Guests tab can save a reply
 var NOTIFY_EMAIL = '';             // optional: an address to email on every reply. Leave '' for none.
 var REPLY_HEADERS = ['Time', 'Code', 'Name', 'Reply', 'Celebrations', 'Guests', 'Food needs', 'Note'];
@@ -24,6 +25,7 @@ function doGet(e) {
     ok: true,
     name: guest.name,
     seats: guest.seats,
+    side: guest.side,
     replied: guest.replied === 'Yes' || guest.replied === 'No'
   });
 }
@@ -97,6 +99,7 @@ function findGuest_(code) {
         row: i + 1,
         name: String(rows[i][1]).trim(),
         seats: Number(rows[i][2]) || 0,
+        side: ({ bride: 'bride', groom: 'groom' })[String(rows[i][SIDE_COLUMN - 1] || '').trim().toLowerCase()] || 'both',
         replied: String(rows[i][REPLIED_COLUMN - 1] || '')
       };
     }
