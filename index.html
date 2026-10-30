@@ -17,6 +17,8 @@
 (function () {
   var m = /[?&]s=(bride|groom|both)(?:&|$)/i.exec(location.search);
   document.documentElement.setAttribute('data-side', m ? m[1].toLowerCase() : 'both');
+  // Temporary, while choosing a layout for the families: add &fam=e to a link to see the centred list instead.
+  if (/[?&]fam=e(?:&|$)/i.test(location.search)) document.documentElement.setAttribute('data-fam', 'e');
 })();
 </script>
 <link rel="preload" href="art/bg.webp" as="image" fetchpriority="high">
@@ -274,17 +276,39 @@ html[data-side="both"] [data-for]:not([data-for~="both"]) { display: none !impor
 .hosts .tbc { border-bottom-width: 1.5px; }
 
 /* The inviting families, at the top of the details */
-.families { margin-top: 26px; display: grid; gap: 22px; max-width: 58ch; }
+.families { margin-top: 26px; display: grid; gap: 18px; }
 .fam-lead { font-family: var(--display); font-style: italic; font-size: 1.15rem; color: var(--teal); }
 .fam-lead span { font-family: var(--deva); font-style: normal; font-size: .9rem; margin-left: 6px; }
-.fam { display: grid; grid-template-columns: 46px minmax(0, 1fr); column-gap: 14px; align-items: start; }
-.fam > .people { grid-column: 2; }
-.fam > .mark { margin-top: 4px; }
 /* The marks sit straight on the paper: Ganesha in indigo with a gold crown, the knot in gold. */
 .mark { display: block; flex: none; height: 54px; width: auto; overflow: visible; }
 .mark.knot { height: 50px; }
-.fam > .mark { width: 46px; height: auto; }
-.fam > .mark.knot { width: 40px; margin-left: 3px; }
+.fside { font: 500 .7rem/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--teal); }
+.fside span { display: block; font-family: var(--deva); font-size: .8rem; letter-spacing: 0; text-transform: none; font-weight: 400; }
+.fp { display: grid; gap: 1px; }
+.fname { font-family: var(--display); font-weight: 600; font-size: 1.32rem; line-height: 1.15; text-wrap: balance; }
+.frole { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 1rem; line-height: 1.3; color: var(--teal); }
+.frole span { font-family: var(--deva); font-style: normal; font-size: .8rem; }
+.fne { font-family: var(--deva); font-size: .8rem; line-height: 1.6; color: var(--ink); opacity: .75; }
+.nbr { white-space: nowrap; }
+/* C (default): the two families side by side, each under its own mark; one family is a single centred column */
+.fam-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; text-align: center; max-width: 560px; }
+html[data-side="both"] .fam-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.fcol { display: grid; justify-items: center; align-content: start; gap: 12px; }
+.fcol .mark { height: 46px; }
+.fcol .mark.knot { height: 42px; margin-block: 2px; }   /* same overall height as Ganesha, so both columns line up */
+/* E (?fam=e): centred, one mark per family, parents named together */
+.fam-stack { display: grid; justify-items: center; gap: 14px; text-align: center; max-width: 560px; }
+.fstack-fam { display: grid; justify-items: center; gap: 10px; }
+.fstack-fam .mark { height: 46px; }
+.fstack-fam .mark.knot { height: 42px; margin-block: 2px; }
+.fam-stack > .dia { width: 7px; height: 7px; background: var(--marigold); transform: rotate(45deg); margin: 6px 0; }
+html:not([data-side="both"]) .fam-stack > .dia { display: none; }
+html:not([data-fam="e"]) .fam-stack, html[data-fam="e"] .fam-cols { display: none; }
+@media (max-width: 640px) {
+  .fam-cols { gap: 10px; }
+  html[data-side="both"] .fcol .fname { font-size: 1.12rem; }
+  html[data-side="both"] .frole { font-size: .92rem; }
+}
 .blessing { display: flex; align-items: center; justify-content: center; gap: 26px; margin: 8px 0 24px; }
 .blessing .mark { height: 124px; }
 .blessing .mark.knot { height: 112px; }
@@ -800,24 +824,38 @@ fieldset.single { display: none !important; }
     <p class="intro">With joy in our hearts, we invite you to celebrate our wedding.</p>
     <p class="intro-ne">हामी विवाह बन्धनमा बाँधिँदै छौँ, र यो खुशीको क्षणमा सहभागी हुन तपाईँलाई हार्दिक निमन्त्रणा गर्दछौँ।</p>
 
-    <!-- The inviting families, signed like a letter. Each side's guests see their own family; Both shows both. -->
+    <!-- The inviting families, signed like a letter. Each side's guests see their own family; Both shows both.
+         Gorey Chhetri is the name to use for now; confirm before sending. -->
     <div class="families">
       <p class="fam-lead">With love, <span lang="ne">शुभेच्छासहित</span></p>
-      <div class="fam" data-for="groom both">
-        <svg class="mark" viewBox="0 0 104 124" role="img" aria-label="Ganesha"><use href="#mk-ganesha-paper"/></svg>
-        <!-- Gorey Chhetri is the name to use for now; confirm before sending. -->
-        <ul class="people">
-          <li><span class="role">Grandfather of the groom <span lang="ne">· बेहुलाका हजुरबुबा</span></span><span class="who">Gorey Chhetri<span lang="ne">गोरे क्षेत्री</span></span></li>
-          <li><span class="role">Father of the groom <span lang="ne">· बेहुलाका बुबा</span></span><span class="who">Anup Kumar Chhetri<span lang="ne">अनुप कुमार क्षेत्री</span></span></li>
-          <li><span class="role">Mother of the groom <span lang="ne">· बेहुलाकी आमा</span></span><span class="who">Pramila Sampang<span lang="ne">प्रमिला साम्पाङ</span></span></li>
-        </ul>
+      <div class="fam-cols">
+        <div class="fcol" data-for="groom both">
+          <svg class="mark" viewBox="0 0 104 124" role="img" aria-label="Ganesha"><use href="#mk-ganesha-paper"/></svg>
+          <p class="fside">Groom's family<span lang="ne">बेहुलाको परिवार</span></p>
+          <div class="fp"><p class="fname">Gorey Chhetri</p><p class="frole">grandfather <span lang="ne">· हजुरबुबा</span></p><p class="fne" lang="ne">गोरे क्षेत्री</p></div>
+          <div class="fp"><p class="fname">Anup Kumar Chhetri</p><p class="frole">father <span lang="ne">· बुबा</span></p><p class="fne" lang="ne">अनुप कुमार क्षेत्री</p></div>
+          <div class="fp"><p class="fname">Pramila Sampang</p><p class="frole">mother <span lang="ne">· आमा</span></p><p class="fne" lang="ne">प्रमिला साम्पाङ</p></div>
+        </div>
+        <div class="fcol" data-for="bride both">
+          <svg class="mark knot" viewBox="0 0 91.9 108.9" role="img" aria-label="Endless knot"><use href="#mk-knot-paper"/></svg>
+          <p class="fside">Bride's family<span lang="ne">बेहुलीको परिवार</span></p>
+          <div class="fp"><p class="fname">Kiran Tamang</p><p class="frole">father <span lang="ne">· बुबा</span></p><p class="fne" lang="ne">किरण तामाङ</p></div>
+          <div class="fp"><p class="fname">Manju Tamang</p><p class="frole">mother <span lang="ne">· आमा</span></p><p class="fne" lang="ne">मन्जु तामाङ</p></div>
+        </div>
       </div>
-      <div class="fam" data-for="bride both">
-        <svg class="mark knot" viewBox="0 0 91.9 108.9" role="img" aria-label="Endless knot"><use href="#mk-knot-paper"/></svg>
-        <ul class="people">
-          <li><span class="role">Father of the bride <span lang="ne">· बेहुलीका बुबा</span></span><span class="who">Kiran Tamang<span lang="ne">किरण तामाङ</span></span></li>
-          <li><span class="role">Mother of the bride <span lang="ne">· बेहुलीकी आमा</span></span><span class="who">Manju Tamang<span lang="ne">मन्जु तामाङ</span></span></li>
-        </ul>
+      <div class="fam-stack">
+        <div class="fstack-fam" data-for="groom both">
+          <svg class="mark" viewBox="0 0 104 124" role="img" aria-label="Ganesha"><use href="#mk-ganesha-paper"/></svg>
+          <p class="fside">The groom's family<span lang="ne">बेहुलाको परिवार</span></p>
+          <div class="fp"><p class="fname">Gorey Chhetri</p><p class="frole">grandfather <span lang="ne">· हजुरबुबा</span></p></div>
+          <div class="fp"><p class="fname"><span class="nbr">Anup Kumar Chhetri</span> <span class="nbr">&amp; Pramila Sampang</span></p><p class="frole">parents <span lang="ne">· बुबा र आमा</span></p></div>
+        </div>
+        <i class="dia" aria-hidden="true"></i>
+        <div class="fstack-fam" data-for="bride both">
+          <svg class="mark knot" viewBox="0 0 91.9 108.9" role="img" aria-label="Endless knot"><use href="#mk-knot-paper"/></svg>
+          <p class="fside">The bride's family<span lang="ne">बेहुलीको परिवार</span></p>
+          <div class="fp"><p class="fname"><span class="nbr">Kiran Tamang</span> <span class="nbr">&amp; Manju Tamang</span></p><p class="frole">parents <span lang="ne">· बुबा र आमा</span></p></div>
+        </div>
       </div>
     </div>
 
