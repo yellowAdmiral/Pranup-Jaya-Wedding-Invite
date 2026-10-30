@@ -54,7 +54,7 @@ CSS = f'''
 * {{ box-sizing: border-box; margin: 0; }}
 html, body {{ background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
 body {{ color: var(--ink); font-family: var(--body); font-size: 9.6pt; line-height: 1.5; }}
-.date, .when, .h2, .who {{ font-variant-numeric: lining-nums; }}
+.date, .when, .h2 {{ font-variant-numeric: lining-nums; }}
 .page {{ width: 154mm; height: 216mm; position: relative; overflow: hidden; break-after: page; page-break-after: always; }}
 .page:last-child {{ break-after: auto; page-break-after: auto; }}
 /* everything that must not be trimmed stays 10 mm inside the trim, i.e. 13 mm from the page edge */
@@ -92,38 +92,27 @@ body {{ color: var(--ink); font-family: var(--body); font-size: 9.6pt; line-heig
 .dear .line {{ flex: 1; border-bottom: .6pt solid rgba(20,24,58,.55); transform: translateY(-1.2mm); }}
 .fam-lead {{ font-family: var(--display); font-style: italic; font-size: 11.5pt; color: var(--teal); margin-top: 5mm; }}
 .fam-lead span {{ font-family: var(--deva); font-style: normal; font-size: 8.4pt; margin-left: 1.5mm; }}
-.families {{ display: grid; gap: 4mm; margin-top: 3mm; }}
-.fam {{ display: grid; grid-template-columns: 11mm 1fr; column-gap: 4mm; align-items: start; }}
-.fam .mark {{ width: 11mm; height: auto; margin-top: .8mm; }}
-.fam .mark.knot {{ width: 9.5mm; margin-left: .7mm; }}
-.people {{ list-style: none; padding: 0; display: grid; gap: 2.2mm; }}
-.people li {{ display: grid; }}
-.role {{ font-family: var(--display); font-style: italic; font-weight: 500; font-size: 10pt; line-height: 1.25; color: var(--teal); }}
-.role span {{ font-family: var(--deva); font-style: normal; font-size: 7.6pt; margin-left: .6mm; }}
-.who {{ font-family: var(--display); font-weight: 600; font-size: 13pt; line-height: 1.2; }}
-.who span {{ font-family: var(--deva); font-weight: 400; font-size: 8pt; opacity: .75; margin-left: 2mm; }}
+.families {{ display: grid; grid-template-columns: 1fr; gap: 6mm; margin-top: 3mm; text-align: center; }}
+.side-both .families {{ grid-template-columns: 1fr 1fr; }}
+.fcol {{ display: grid; justify-items: center; align-content: start; gap: 1.7mm; }}
+.fcol .mark {{ height: 11mm; width: auto; }}
+.fcol .mark.knot {{ height: 10mm; margin-block: .5mm; }}
+.fside {{ font: 500 6.8pt/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--teal); }}
+.fside span {{ display: block; font-family: var(--deva); font-size: 7.6pt; letter-spacing: 0; text-transform: none; }}
+.fp {{ display: grid; }}
+.fname {{ font-family: var(--display); font-weight: 600; font-size: 13.5pt; line-height: 1.15; font-variant-numeric: lining-nums; }}
+.frole {{ font-family: var(--display); font-style: italic; font-weight: 500; font-size: 10.5pt; line-height: 1.3; color: var(--teal); }}
+.frole span {{ font-family: var(--deva); font-style: normal; font-size: 7.8pt; }}
+.fne {{ font-family: var(--deva); font-size: 7.8pt; line-height: 1.35; opacity: .75; }}
 .grow {{ flex: 1; }}
 .inv .h2 {{ font-size: 24pt; }}
 .inv .intro {{ font-size: 14pt; }}
 .inv .intro-ne {{ font-size: 9.2pt; }}
-.inv .dear {{ font-size: 15pt; margin-bottom: 6mm; }}
-.inv .fam-lead {{ font-size: 12.5pt; margin-top: 6mm; }}
-.inv .who {{ font-size: 14.5pt; }}
-.inv .role {{ font-size: 11pt; }}
-.inv .role span {{ font-size: 8.2pt; }}
-.inv .who span {{ font-size: 8.8pt; }}
-.inv .people {{ gap: 3mm; }}
-.inv .families {{ gap: 5.5mm; }}
+.inv .dear {{ font-size: 15pt; margin-bottom: 4.5mm; }}
+.inv .fam-lead {{ font-size: 12.5pt; margin-top: 4.5mm; }}
 .inv .blessing .mark {{ height: 30mm; }}
 .inv .blessing .mark.knot {{ height: 28mm; }}
-.inv .blessing {{ gap: 6mm; margin: 4mm 0 5mm; }}
-/* Both families on one page: a little tighter so it all fits between the bands */
-.side-both .inv .blessing {{ margin: 1mm 0 3mm; }}
-.side-both .inv .dear {{ margin-bottom: 4mm; }}
-.side-both .inv .intro {{ margin-top: 3mm; }}
-.side-both .inv .fam-lead {{ margin-top: 4mm; }}
-.side-both .inv .families {{ gap: 3.5mm; margin-top: 2mm; }}
-.side-both .inv .people {{ gap: 2mm; }}
+.inv .blessing {{ gap: 6mm; margin: 2mm 0 3mm; }}
 
 /* Details */
 .events {{ display: grid; gap: 5mm; margin-top: 5mm; }}
@@ -161,15 +150,15 @@ body {{ color: var(--ink); font-family: var(--body); font-size: 9.6pt; line-heig
 '''
 
 def fam_block(side):
-    groom = f'''<div class="fam">{GANESHA}<ul class="people">
-      <li><span class="role">Grandfather of the groom <span>· बेहुलाका हजुरबुबा</span></span><span class="who">Gorey Chhetri<span class="ne">गोरे क्षेत्री</span></span></li>
-      <li><span class="role">Father of the groom <span>· बेहुलाका बुबा</span></span><span class="who">Anup Kumar Chhetri<span class="ne">अनुप कुमार क्षेत्री</span></span></li>
-      <li><span class="role">Mother of the groom <span>· बेहुलाकी आमा</span></span><span class="who">Pramila Sampang<span class="ne">प्रमिला साम्पाङ</span></span></li>
-    </ul></div>'''
-    bride = f'''<div class="fam">{KNOT}<ul class="people">
-      <li><span class="role">Father of the bride <span>· बेहुलीका बुबा</span></span><span class="who">Kiran Tamang<span class="ne">किरण तामाङ</span></span></li>
-      <li><span class="role">Mother of the bride <span>· बेहुलीकी आमा</span></span><span class="who">Manju Tamang<span class="ne">मन्जु तामाङ</span></span></li>
-    </ul></div>'''
+    def person(name, role, rne, nne):
+        return f'<div class="fp"><p class="fname">{name}</p><p class="frole">{role} <span>· {rne}</span></p><p class="fne">{nne}</p></div>'
+    groom = f'''<div class="fcol">{GANESHA}<p class="fside">Groom's family<span>बेहुलाको परिवार</span></p>
+      {person("Gorey Chhetri", "grandfather", "हजुरबुबा", "गोरे क्षेत्री")}
+      {person("Anup Kumar Chhetri", "father", "बुबा", "अनुप कुमार क्षेत्री")}
+      {person("Pramila Sampang", "mother", "आमा", "प्रमिला साम्पाङ")}</div>'''
+    bride = f'''<div class="fcol">{KNOT}<p class="fside">Bride's family<span>बेहुलीको परिवार</span></p>
+      {person("Kiran Tamang", "father", "बुबा", "किरण तामाङ")}
+      {person("Manju Tamang", "mother", "आमा", "मन्जु तामाङ")}</div>'''
     return {'groom': groom, 'bride': bride, 'both': groom + bride}[side]
 
 WEDDING = f'''<div class="event"><div>
