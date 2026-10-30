@@ -266,7 +266,7 @@ if __name__ == '__main__':
     with sync_playwright() as p:
         b = p.chromium.launch()
         for side, fname in names.items():
-            path = os.path.join(HERE, f'print-{side}.html')
+            path = os.path.join(OUT, f'print-{side}.html')  # intermediate page, kept with the PDFs
             open(path, 'w').write(page_html(side))
             pg = b.new_page()
             pg.goto('file://' + path); pg.wait_for_timeout(600)
