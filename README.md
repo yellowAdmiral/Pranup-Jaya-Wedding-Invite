@@ -51,3 +51,14 @@ Until a photo is there, its frame shows a dusk-coloured card that says "Photo to
 - Still to fill in: the reception date, venue name and directions, and the story years (dashed underlines on the page).
 - The countdown runs to 10 February 2027, 11:00 AM India time. After that it changes to a thank-you line.
 - Arrival details typed into the RSVP form are saved at the start of the guest's note in the sheet, so the Apps Script needs no change.
+
+## Printed invitations
+
+`tools/print/` makes three print-ready PDFs (both families, bride's side, groom's side) from the same content and art as the site:
+A5 pages (148 x 210 mm) with 3 mm bleed: cover, invitation with a blank "Dear ____" line, details with map QR codes, and a blank reply card.
+
+    ./tools/print/fetch-fonts.sh      # once
+    python3 tools/print/cover.py
+    python3 tools/print/build.py      # PDFs land in tools/print/out/
+
+Before printing for real: fill in the reception date and venue, and replace `MAP_RECEPTION` in `build.py` with the venue's map link (it points to Gorubathan for now).
