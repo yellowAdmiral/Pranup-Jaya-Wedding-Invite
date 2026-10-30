@@ -114,8 +114,16 @@ body {{ color: var(--ink); font-family: var(--body); font-size: 9.6pt; line-heig
 .inv .who span {{ font-size: 8.8pt; }}
 .inv .people {{ gap: 3mm; }}
 .inv .families {{ gap: 5.5mm; }}
-.inv .blessing .mark {{ height: 15mm; }}
-.inv .blessing .mark.knot {{ height: 14mm; }}
+.inv .blessing .mark {{ height: 30mm; }}
+.inv .blessing .mark.knot {{ height: 28mm; }}
+.inv .blessing {{ gap: 6mm; margin: 4mm 0 5mm; }}
+/* Both families on one page: a little tighter so it all fits between the bands */
+.side-both .inv .blessing {{ margin: 1mm 0 3mm; }}
+.side-both .inv .dear {{ margin-bottom: 4mm; }}
+.side-both .inv .intro {{ margin-top: 3mm; }}
+.side-both .inv .fam-lead {{ margin-top: 4mm; }}
+.side-both .inv .families {{ gap: 3.5mm; margin-top: 2mm; }}
+.side-both .inv .people {{ gap: 2mm; }}
 
 /* Details */
 .events {{ display: grid; gap: 5mm; margin-top: 5mm; }}
@@ -193,7 +201,7 @@ def page_html(side):
     t = T[side]
     both_events = side == 'both'
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Pranup &amp; Jaya - invitation ({side})</title>
-<style>{CSS}</style></head><body>{DEFS}
+<style>{CSS}</style></head><body class="side-{side}">{DEFS}
 
 <section class="page cover"><div class="safe">
   <div class="arch"><div class="win" role="img" aria-label="Watercolour of a lighthouse at dusk"></div></div>
