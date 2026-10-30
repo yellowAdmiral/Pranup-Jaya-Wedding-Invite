@@ -26,7 +26,7 @@ The page opens on a watercolour painting of the same spot as the film: chalk cli
 ## Add the video
 
 Run `./tools/make-video.sh your-recording.mov` (needs ffmpeg), or send the recording to Claude to do it.
-Keep `hero.mp4` under about 10 MB so it loads quickly on phones. GitHub rejects files over 100 MB.
+`hero.mp4` is the original 1080p recording (about 20 MB), kept at full quality because phones show it zoomed in. Only the sound track was removed and the file reordered so playback starts before it has fully downloaded (`ffmpeg -i in.mp4 -map 0:v:0 -c:v copy -an -movflags +faststart hero.mp4`). GitHub rejects files over 100 MB.
 
 ## Add your story photos
 
