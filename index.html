@@ -459,13 +459,25 @@ fieldset.single { display: none !important; }
     .pj-hero { width: 76px; }
   }
 
-  /* After the reveal: the film fills the screen, the names move up into the sky, and the couple stay clear. */
-  .hero.entered { justify-content: flex-start; gap: 18px; padding-bottom: 28px; }
+  /* After the reveal: the film fills the screen and the names settle into the bottom right corner,
+     with the scroll prompt centred beneath them. */
+  .hero.entered { justify-content: space-between; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
   .hero.entered .hosts, .hero.entered .count, .hero.entered .count-done, .hero.entered .greet { display: none; }
-  .hero.entered .names { font-size: clamp(2.6rem, 12vw, 3.4rem); }
-  .hero.entered .hero-copy { flex: 1; }
-  .hero.entered .cue-wrap { margin-top: auto; align-self: stretch; align-items: center; }
-  .cue { font-size: 1.05rem; text-shadow: 0 1px 10px rgba(20, 24, 58, .9); }
+  .hero.entered .hero-copy { flex: 1; align-self: stretch; max-width: none; justify-content: flex-end; align-items: flex-end;
+    text-align: right; gap: 2px; }
+  .hero.entered .names { font-size: clamp(2.5rem, 11.5vw, 3.2rem); text-shadow: 0 2px 18px rgba(20, 24, 58, .7); }
+  .hero.entered .names-ne { font-size: 1.2rem; }
+  .hero.entered .when { font-size: 1.08rem; max-width: 24ch; margin-top: 2px; text-shadow: 0 1px 12px rgba(20, 24, 58, .9); }
+  .hero.entered .cue-wrap { align-self: stretch; align-items: center; text-align: center; margin-top: 26px; gap: 2px; }
+  /* The chevron hangs to the right of the words, so the words themselves are what is centred. */
+  .cue { position: relative; font-size: 1.05rem; text-shadow: 0 1px 10px rgba(20, 24, 58, .9); }
+  .cue svg { position: absolute; left: 100%; top: 50%; margin: -8px 0 0 8px; }
+  @media (max-height: 700px) {
+    .hero.entered .names { font-size: clamp(2.2rem, 10.5vw, 2.7rem); }
+    .hero.entered .names-ne { font-size: 1.05rem; }
+    .hero.entered .when { font-size: 1rem; }
+    .hero.entered .cue-wrap { margin-top: 16px; }
+  }
 
   /* Details: full-width sheets, lighter borders, bigger text */
   .sheet { padding-inline: 0; padding-bottom: 96px; row-gap: 22px; }
@@ -497,11 +509,13 @@ fieldset.single { display: none !important; }
 /* Tall screens: the film is cropped to the screen's height and drifts slowly from the lighthouse
    to the two of you, so both are seen. Only transform moves, so it stays smooth. */
 @media (max-aspect-ratio: 4/5) {
-  .film { right: auto; width: auto; aspect-ratio: 16 / 9; height: 100%; object-fit: cover;
+  /* A little taller than the screen and anchored to the bottom, so the two of you sit higher, above the names. */
+  .film { top: auto; bottom: 0; right: auto; width: auto; aspect-ratio: 16 / 9; height: 116%; object-fit: cover;
     animation: pan 22s ease-in-out infinite alternate; }
   @keyframes pan { from { transform: translateX(calc(50vw - 82%)); } to { transform: translateX(calc(50vw - 46%)); } }
-  .stage.filmon .shade { background: linear-gradient(to bottom, rgba(20,24,58,.62) 0%, rgba(20,24,58,.18) 30%, rgba(20,24,58,0) 45%,
-    rgba(20,24,58,0) 72%, rgba(20,24,58,.6) 100%); }
+  .stage.filmon .shade { background:
+    radial-gradient(120% 55% at 100% 100%, rgba(20,24,58,.55) 0%, rgba(20,24,58,0) 70%),
+    linear-gradient(to bottom, rgba(20,24,58,.45) 0%, rgba(20,24,58,0) 22%, rgba(20,24,58,0) 58%, rgba(20,24,58,.72) 100%); }
 }
 @media (max-aspect-ratio: 4/5) and (prefers-reduced-motion: reduce) {
   .film { animation: none; transform: translateX(calc(50vw - 80%)); }
