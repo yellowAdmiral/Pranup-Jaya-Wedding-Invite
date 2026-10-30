@@ -44,7 +44,8 @@ Until a photo is there, its frame shows a dusk-coloured card that says "Photo to
 - The RSVP form sends replies to a Google Sheet through a small Apps Script. Setup steps are in `apps-script/README.md`. Until the `ENDPOINT` line in `index.html` is filled in, or if the script cannot be reached, the form falls back to preparing an email to the `RSVP_EMAIL` address.
 - Personal links end in `?g=CODE`. The page looks the code up in the sheet to greet the guest by first name.
 - There are three versions, set by column I (Side) on the Guests tab: **Bride** shows the wedding in Darjeeling, **Groom** shows the reception in Gorubathan, **Both** shows both. The sheet adds `&s=bride` or `&s=groom` to the link, so the right version shows straight away. A link without a code works too, for example `?s=groom` to share in a group.
-- Still to fill in for the versions: the parents' names in the opening line (search `index.html` for `[Jaya's parents]` and `[Pranup's parents]`), and the reception date, which also sets the groom's-side countdown (`RECEPTION` in `index.html`).
+- The families are named at the top of the details (search `index.html` for `class="families"`): the groom's side sees Pranup's family, the bride's side sees Jaya's, Both sees both.
+- Still to fill in for the versions: the reception date, which also sets the groom's-side countdown (`RECEPTION` in `index.html`).
 - The repository is public, so the address, venue and reply email in the source are public too.
 - Still to fill in: the reception date, venue name and directions, and the story years (dashed underlines on the page).
 - The countdown runs to 10 February 2027, 11:00 AM India time. After that it changes to a thank-you line.

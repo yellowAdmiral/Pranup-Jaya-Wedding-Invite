@@ -273,6 +273,15 @@ html[data-side="both"] [data-for]:not([data-for~="both"]) { display: none !impor
   color: var(--ivory-dim); text-shadow: 0 2px 14px rgba(20,24,58,.6); max-width: 42ch; margin-bottom: -6px; }
 .hosts .tbc { border-bottom-width: 1.5px; }
 
+/* The inviting families, at the top of the details */
+.families { margin-top: 26px; display: grid; gap: 14px; max-width: 58ch; }
+.fam-lead { font-family: var(--display); font-style: italic; font-size: 1.15rem; color: var(--teal); }
+.fam-lead span { font-family: var(--deva); font-style: normal; font-size: .9rem; margin-left: 6px; }
+.fam { padding-left: 16px; border-left: 2px solid var(--marigold); display: grid; gap: 2px; }
+.fam-names { font-family: var(--display); font-weight: 600; font-size: clamp(1.3rem, 3.6vw, 1.55rem); line-height: 1.25; text-wrap: balance; }
+.fam .nb { white-space: nowrap; }
+.fam-ne { font-family: var(--deva); font-size: .95rem; line-height: 1.7; color: var(--teal); }
+
 /* ---------- Motion vocabulary ----------
    One easing for everything that arrives, so the page moves as one hand.
    Only opacity and transform are animated, which phones handle cheaply. */
@@ -695,11 +704,10 @@ fieldset.single { display: none !important; }
   <svg class="pj pj-hero hero-top" role="img" aria-label="Pranup and Jaya monogram, 10 02 2027"><use href="#pj"/></svg>
   <div class="hero-copy" id="heroCopy">
     <p class="greet" id="greet" hidden></p>
-    <!-- Who the invitation is from. Replace the bracketed names with the parents' names. -->
+    <!-- The families are named inside, at the top of the details. -->
     <p class="hosts">
-      <span data-for="bride"><span class="tbc">[Jaya's parents]</span> invite you to the wedding of</span>
-      <span data-for="groom"><span class="tbc">[Pranup's parents]</span> invite you to the wedding reception of</span>
-      <span data-for="both"><span class="tbc">[Jaya's parents]</span> and <span class="tbc">[Pranup's parents]</span> invite you to the wedding of</span>
+      <span data-for="bride both">We invite you to the wedding of</span>
+      <span data-for="groom">We invite you to the wedding reception of</span>
     </p>
     <h1 class="names" id="names" tabindex="-1">Pranup &amp; Jaya</h1>
     <p class="names-ne">प्रनुप र जया</p>
@@ -766,9 +774,20 @@ fieldset.single { display: none !important; }
     <h2 class="h2" id="dTitle"><span data-for="bride">Join us for our wedding</span><span data-for="groom">Join us for our reception</span><span data-for="both">Two days to be with us</span></h2>
     <p class="h2-ne"><span data-for="bride">विवाह समारोह</span><span data-for="groom">स्वागत समारोह</span><span data-for="both">उत्सवका दिनहरू</span></p>
     <p class="intro">With joy in our hearts, we invite you to celebrate our wedding.</p>
-    <p class="intro-ne" data-for="bride"><span class="tbc">[जयाका आमाबुबा]</span> आफ्नी छोरी जयाको विवाहमा तपाईंलाई हार्दिक निमन्त्रणा गर्नुहुन्छ।</p>
-    <p class="intro-ne" data-for="groom"><span class="tbc">[प्रनुपका आमाबुबा]</span> आफ्नो छोरा प्रनुपको विवाहको स्वागत समारोहमा तपाईंलाई हार्दिक निमन्त्रणा गर्नुहुन्छ।</p>
-    <p class="intro-ne" data-for="both">हामी विवाह बन्धनमा बाँधिँदै छौं, र यो खुशीको क्षणमा सहभागी हुन तपाईंलाई हार्दिक निमन्त्रणा गर्दछौं।</p>
+    <p class="intro-ne">हामी विवाह बन्धनमा बाँधिँदै छौं, र यो खुशीको क्षणमा सहभागी हुन तपाईंलाई हार्दिक निमन्त्रणा गर्दछौं।</p>
+
+    <!-- The inviting families, signed like a letter. Each side's guests see their own family; Both shows both. -->
+    <div class="families">
+      <p class="fam-lead">With love, <span lang="ne">शुभेच्छासहित</span></p>
+      <div class="fam" data-for="groom both">
+        <p class="fam-names"><span class="nb">Anup Kumar Chhetri,</span> <span class="nb">Pramila Sampang</span> <span class="nb">&amp; Pranup Chhetri</span></p>
+        <p class="fam-ne" lang="ne"><span class="nb">अनुप कुमार क्षेत्री,</span> <span class="nb">प्रमिला साम्पाङ</span> <span class="nb">र प्रनुप क्षेत्री</span></p>
+      </div>
+      <div class="fam" data-for="bride both">
+        <p class="fam-names"><span class="nb">Kiran Tamang,</span> <span class="nb">Manju Tamang</span> <span class="nb">&amp; Jaya Jyoti Tamang</span></p>
+        <p class="fam-ne" lang="ne"><span class="nb">किरण तामाङ,</span> <span class="nb">मन्जु तामाङ</span> <span class="nb">र जया ज्योति तामाङ</span></p>
+      </div>
+    </div>
 
     <div class="events">
       <article class="event" data-for="bride both">
