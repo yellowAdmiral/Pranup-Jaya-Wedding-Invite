@@ -351,12 +351,14 @@ html[data-side="both"] .fam-cols { grid-template-columns: minmax(0, 1fr) minmax(
 .sheet { grid-template-columns: minmax(0, 1fr); align-items: start; }
 .invite { display: grid; gap: 40px; min-width: 0; }
 @media (min-width: 1040px) {
-  .sheet { grid-template-columns: clamp(250px, 23vw, 320px) minmax(0, 1fr); column-gap: clamp(28px, 3.5vw, 56px); }
-  .invite .panel { margin-inline: 0 auto; }
+  .sheet:not(.story-off) { grid-template-columns: clamp(250px, 23vw, 320px) minmax(0, 1fr); column-gap: clamp(28px, 3.5vw, 56px); }
+  .sheet:not(.story-off) .invite .panel { margin-inline: 0 auto; }
 }
 
 /* ---------- Our story: photo prints laid beside the letter ---------- */
 .story { min-width: 0; color: var(--ivory); padding-top: 18px; }
+/* "Our story" is switched off for now: see the note on <div class="sheet"> */
+.story[hidden] { display: none !important; }
 .story-head { display: grid; gap: 2px; margin-bottom: 26px; }
 .story-title { font-family: var(--script); font-weight: 400; font-size: clamp(2.6rem, 7vw, 3.4rem); line-height: 1.05; text-shadow: 0 2px 16px rgba(20,24,58,.55); }
 .story-ne { font-family: var(--deva); font-size: 1rem; color: var(--marigold); }
@@ -775,10 +777,12 @@ fieldset.single { display: none !important; }
   </div>
 </header>
 
-<div class="sheet" id="sheet" hidden>
+<!-- "Our story" is switched off for now. To turn it back on: remove "story-off" from this div's class,
+     and remove the word hidden from <aside class="story"> below. -->
+<div class="sheet story-off" id="sheet" hidden>
   <!-- Our story. To add a photo, put it in the story folder as 1.jpg to 5.jpg (portrait, about 1000 px tall).
        Until a photo is there, its frame shows a dusk-coloured card. Change the years and captions below. -->
-  <aside class="story" id="story" aria-labelledby="sTitle">
+  <aside class="story" id="story" aria-labelledby="sTitle" hidden>
     <div class="story-head rv">
       <h2 class="story-title" id="sTitle">Our story</h2>
       <p class="story-ne">हाम्रो कथा</p>

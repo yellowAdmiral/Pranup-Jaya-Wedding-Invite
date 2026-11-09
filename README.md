@@ -30,6 +30,8 @@ Run `./tools/make-video.sh your-recording.mov` (needs ffmpeg), or send the recor
 
 ## Add your story photos
 
+**Switched off for now.** To turn the section back on, open `index.html`, remove `story-off` from `<div class="sheet story-off" id="sheet" hidden>`, and remove the word `hidden` from `<aside class="story" ...>`.
+
 The "Our story" prints sit to the left of the invitation on computers and become a swipeable row on phones.
 
 1. Make a folder called `story` in the repository.
