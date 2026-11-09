@@ -1447,6 +1447,7 @@ fieldset.single { display: none !important; }
     var yes = $('replyYes').checked;
     var payload = {
       code: guestCode,
+      side: side(),   // lets the sheet tag replies from the shared bride / groom links
       name: $('name').value.trim(),
       reply: yes ? 'Yes' : 'No',
       events: yes ? Array.prototype.map.call(form.querySelectorAll('input[name="ev"]:checked'), function (c) { return c.value; }).join(' and ') : '',

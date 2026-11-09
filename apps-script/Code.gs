@@ -7,13 +7,16 @@
  * Tabs it expects:
  *   Guests  columns: A Code, B Guest name(s), C Seats, ... H Replied?, I Side (Bride, Groom or Both)
  *   Replies created automatically; one row per guest code, newest answer wins.
+ *           Replies from the shared links have no code; they are saved as GENERIC-BRIDE / GENERIC-GROOM /
+ *           GENERIC-BOTH, one row each (they never replace one another).
  */
 
 var GUESTS_TAB = 'Guests';
 var REPLIES_TAB = 'Replies';
 var REPLIED_COLUMN = 8;            // column H on the Guests tab
 var SIDE_COLUMN = 9;               // column I: Bride, Groom or Both (blank counts as Both)
-var REQUIRE_VALID_CODE = true;     // true: only guests with a real code from the Guests tab can save a reply
+var REQUIRE_VALID_CODE = true;     // true: a reply carrying a personal code must match a real code on the Guests tab
+var ALLOW_GENERIC_LINKS = true;    // true: replies from the shared links (?s=bride, ?s=groom), which carry no code, are saved too
 var NOTIFY_EMAIL = '';             // optional: an address to email on every reply. Leave '' for none.
 var REPLY_HEADERS = ['Time', 'Code', 'Name', 'Reply', 'Celebrations', 'Guests', 'Food needs', 'Note'];
 
@@ -43,10 +46,13 @@ function doPost(e) {
   if (!name || !reply) return json_({ ok: false, error: 'missing name or reply' });
 
   var code = String(d.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
-  if (REQUIRE_VALID_CODE && !findGuest_(code)) return json_({ ok: false, error: 'unknown code' });
+  var side = ({ bride: 'BRIDE', groom: 'GROOM', both: 'BOTH' })[String(d.side || '').toLowerCase()] || 'BOTH';
+  var generic = !code;
+  if (generic && !ALLOW_GENERIC_LINKS) return json_({ ok: false, error: 'unknown code' });
+  if (!generic && REQUIRE_VALID_CODE && !findGuest_(code)) return json_({ ok: false, error: 'unknown code' });
   var guests = reply === 'Yes' ? Math.max(1, Math.min(parseInt(d.guests, 10) || 1, 20)) : 0;
   var record = [
-    new Date(), code, name, reply,
+    new Date(), generic ? 'GENERIC-' + side : code, name, reply,
     reply === 'Yes' ? clean_(d.events, 200) : '',
     guests,
     reply === 'Yes' ? clean_(d.diet, 200) : '',
@@ -60,7 +66,7 @@ function doPost(e) {
     var sheet = repliesSheet_(ss);
 
     var target = 0;
-    if (code) {
+    if (!generic) {
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         if (String(rows[i][1]).toUpperCase() === code) { target = i + 1; break; }

@@ -35,3 +35,8 @@ Editing `Code.gs` does nothing for guests until you redeploy: **Deploy > Manage 
 
 Column I on the Guests tab says which side invited the guest. The invite link already carries it, so nothing else is needed.
 If you change someone's side after sending their link, paste the latest `Code.gs` and redeploy (see above): the page then takes the side from the sheet, whatever the link says.
+
+## Shared links (no guest name)
+
+`?s=bride` and `?s=groom` on the invite address give a version with no personal greeting, for group chats. Both links, with a message to send, are on the Setup tab (rows 22 to 24).
+Replies from these links need the latest `Code.gs`: paste it in and redeploy (see "If you change the script later"). They are saved on the Replies tab with `GENERIC-BRIDE` or `GENERIC-GROOM` in the Code column, one row per reply. Set `ALLOW_GENERIC_LINKS` to `false` to stop accepting them.
